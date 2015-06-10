@@ -1,3 +1,8 @@
+/**
+ * This is a D3.js Graph Editor Modul
+ * which was extended from http://bl.ocks.org/rkirsling/5001347
+ *
+**/
 GraphEditor = function(element, options){
 
     //data
