@@ -18,11 +18,13 @@ GraphEditor = function(element, options){
     //container
     this._svg = d3.select(this._div)
         .append('svg')
+        .attr('class', 'graphEditor_svg')
         .attr('width', this._width)
         .attr('height', this._height);
 
     //end arrow
     this._svg.append('svg:defs').append('svg:marker')
+            .attr('class', 'graphEditor_path')
             .attr('id', 'end-arrow')
             .attr('viewBox', '0 -5 10 10')
             .attr('refX', 6)
@@ -35,6 +37,7 @@ GraphEditor = function(element, options){
 
     //start arrow
     this._svg.append('svg:defs').append('svg:marker')
+            .attr('class', 'graphEditor_path')
             .attr('id', 'start-arrow')
             .attr('viewBox', '0 -5 10 10')
             .attr('refX', 4)
@@ -47,7 +50,7 @@ GraphEditor = function(element, options){
 
     //drag line
     this._drag_line = this._svg.append('svg:path')
-        .attr('class', 'link dragline hidden')
+        .attr('class', 'graphEditor_path link dragline hidden')
         .attr('d', 'M0,0L0,0');
 
     //layout
@@ -120,7 +123,7 @@ GraphEditor.prototype.restart = function restart() {
 
     //enter section (path)
     this._path.enter().append('svg:path')
-        .attr('class', 'link')
+        .attr('class', 'graphEditor_path link')
         .classed('selected', function(d) { return d === self._selected_link; })
         .style('marker-start', function(d) { return d.left ? 'url(#start-arrow)' : ''; })
         .style('marker-end', function(d) { return d.right ? 'url(#end-arrow)' : ''; })
@@ -140,7 +143,7 @@ GraphEditor.prototype.restart = function restart() {
     var g = this._circle.enter().append('svg:g');
 
     g.append('svg:circle')
-        .attr('class', 'node')
+        .attr('class', 'graphEditor_circle node')
         .attr('r', 12)
         .style('fill', function(d) { return (d === self._selected_node) ? d3.rgb(self._color(d.id)).brighter().toString() : self._color(d.id); })
         .style('stroke', function(d) { return d3.rgb(self._color(d.id)).darker().toString(); })
@@ -149,9 +152,9 @@ GraphEditor.prototype.restart = function restart() {
         .on('mouseup', this.mouseCircleUp.bind(self));
 
     g.append('svg:text')
+        .attr('class', 'graphEditor_circleText graphEditor_circleID')
         .attr('x', 0)
         .attr('y', 4)
-        .attr('class', 'id')
         .text(function(d) { return d.id; });
 
     //exit section circle

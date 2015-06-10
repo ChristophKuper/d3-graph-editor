@@ -1,4 +1,4 @@
-svg {
+.graphEditor_svg {
   background-color: #FFF;
   cursor: default;
   -webkit-user-select: none;
@@ -8,49 +8,49 @@ svg {
   user-select: none;
 }
 
-svg:not(.active):not(.ctrl) {
+.graphEditor_svg:not(.active):not(.ctrl) {
   cursor: crosshair;
 }
 
-path.link {
+.graphEditor_path.link {
   fill: none;
   stroke: #000;
   stroke-width: 4px;
   cursor: default;
 }
 
-svg:not(.active):not(.ctrl) path.link {
+.graphEditor_svg:not(.active):not(.ctrl) .graphEditor_path.link {
   cursor: pointer;
 }
 
-path.link.selected {
+.graphEditor_path.link.selected {
   stroke-dasharray: 10,2;
 }
 
-path.link.dragline {
+.graphEditor_path.link.dragline {
   pointer-events: none;
 }
 
-path.link.hidden {
+.graphEditor_path.link.hidden {
   stroke-width: 0;
 }
 
-circle.node {
+.graphEditor_circle.node {
   stroke-width: 1.5px;
   cursor: pointer;
 }
 
-circle.node.reflexive {
+.graphEditor_circle.node.reflexive {
   stroke: #000 !important;
   stroke-width: 2.5px;
 }
 
-text {
+.graphEditor_circleText {
   font: 12px sans-serif;
   pointer-events: none;
 }
 
-text.id {
+.graphEditor_circleText.graphEditor_circleID {
   text-anchor: middle;
   font-weight: bold;
 }
