@@ -1,23 +1,4 @@
 $(function(){
-    var editor = new GraphEditor("#graphEditor");
-});
-
-GraphEditor = function(element, options){
-
-    this._options = options || {};
-
-    this._div           = element                    || "";
-    this._width         = this._options.width        || 500;
-    this._height        = this._options.height       || 500;
-    this._charge        = this._options.carge        || -500;
-    this._linkDistance  = this._options.linkDistance || 150;
-
-    this._color = colors = d3.scale.category10();
-
-    this._svg = d3.select(this._div)
-        .append('svg')
-        .attr('width', this._width)
-        .attr('height', this._height);
 
     this._lastNodeId = 2;
 
@@ -31,6 +12,29 @@ GraphEditor = function(element, options){
         {source: this._nodes[0], target: this._nodes[1], left: false, right: true },
         {source: this._nodes[1], target: this._nodes[2], left: false, right: true }
     ];
+
+    var editor = new GraphEditor("#graphEditor");
+});
+
+GraphEditor = function(element, options){
+
+    this._options       = options                    || {};
+    this._nodes         = this._options.nodes        || [];
+    this._links         = this._options.links        || [];
+    this._lastNodeId    = this._options.lastNodeID   || 0;
+
+    this._div           = element                    || "";
+    this._width         = this._options.width        || 500;
+    this._height        = this._options.height       || 500;
+    this._charge        = this._options.carge        || -500;
+    this._linkDistance  = this._options.linkDistance || 150;
+
+    this._color = d3.scale.category10();
+
+    this._svg = d3.select(this._div)
+        .append('svg')
+        .attr('width', this._width)
+        .attr('height', this._height);
 
     this._svg.append('svg:defs').append('svg:marker')
             .attr('id', 'end-arrow')
@@ -136,7 +140,7 @@ GraphEditor.prototype.restart = function restart() {
     this._circle = this._circle.data(this._nodes, function(d) { return d.id; });
 
     this._circle.selectAll('circle')
-        .style('fill', function(d) { return (d === self._selected_node) ? d3.rgb(colors(d.id)).brighter().toString() : colors(d.id); })
+        .style('fill', function(d) { return (d === self._selected_node) ? d3.rgb(self._color(d.id)).brighter().toString() : self._color(d.id); })
         .classed('reflexive', function(d) { return d.reflexive; });
 
     var g = this._circle.enter().append('svg:g');
@@ -144,8 +148,8 @@ GraphEditor.prototype.restart = function restart() {
     g.append('svg:circle')
         .attr('class', 'node')
         .attr('r', 12)
-        .style('fill', function(d) { return (d === self._selected_node) ? d3.rgb(colors(d.id)).brighter().toString() : colors(d.id); })
-        .style('stroke', function(d) { return d3.rgb(colors(d.id)).darker().toString(); })
+        .style('fill', function(d) { return (d === self._selected_node) ? d3.rgb(self._color(d.id)).brighter().toString() : self._color(d.id); })
+        .style('stroke', function(d) { return d3.rgb(self._color(d.id)).darker().toString(); })
         .classed('reflexive', function(d) { return d.reflexive; })
         .on('mousedown', this.mouseCircleDown.bind(self))
         .on('mouseup', this.mouseCircleUp.bind(self));
