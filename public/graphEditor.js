@@ -1,28 +1,12 @@
-$(function(){
-
-    this._lastNodeId = 2;
-
-    this._nodes = [
-        {id: 0, reflexive: false},
-        {id: 1, reflexive: true },
-        {id: 2, reflexive: false}
-    ];
-
-    this._links = [
-        {source: this._nodes[0], target: this._nodes[1], left: false, right: true },
-        {source: this._nodes[1], target: this._nodes[2], left: false, right: true }
-    ];
-
-    var editor = new GraphEditor("#graphEditor");
-});
-
 GraphEditor = function(element, options){
 
+    //data
     this._options       = options                    || {};
     this._nodes         = this._options.nodes        || [];
     this._links         = this._options.links        || [];
-    this._lastNodeId    = this._options.lastNodeID   || 0;
+    this._lastNodeID    = this._options.lastNodeID   || 0;
 
+    //settings
     this._div           = element                    || "";
     this._width         = this._options.width        || 500;
     this._height        = this._options.height       || 500;
@@ -31,11 +15,13 @@ GraphEditor = function(element, options){
 
     this._color = d3.scale.category10();
 
+    //container
     this._svg = d3.select(this._div)
         .append('svg')
         .attr('width', this._width)
         .attr('height', this._height);
 
+    //end arrow
     this._svg.append('svg:defs').append('svg:marker')
             .attr('id', 'end-arrow')
             .attr('viewBox', '0 -5 10 10')
@@ -47,6 +33,7 @@ GraphEditor = function(element, options){
             .attr('d', 'M0,-5L10,0L0,5')
             .attr('fill', '#000');
 
+    //start arrow
     this._svg.append('svg:defs').append('svg:marker')
             .attr('id', 'start-arrow')
             .attr('viewBox', '0 -5 10 10')
@@ -58,10 +45,12 @@ GraphEditor = function(element, options){
             .attr('d', 'M10,-5L0,0L10,5')
             .attr('fill', '#000');
 
+    //drag line
     this._drag_line = this._svg.append('svg:path')
         .attr('class', 'link dragline hidden')
         .attr('d', 'M0,0L0,0');
 
+    //layout
     this._force = d3.layout.force()
         .nodes(this._nodes)
         .links(this._links)
@@ -70,9 +59,11 @@ GraphEditor = function(element, options){
         .charge(this._charge)
         .on('tick', this.tick.bind(this));
 
+    //path and circle container
     this._path = this._svg.append('svg:g').selectAll('path');
     this._circle = this._svg.append('svg:g').selectAll('g');
 
+    //status saves
     this._selected_node = null;
     this._selected_link = null;
     this._mousedown_link = null;
@@ -80,6 +71,7 @@ GraphEditor = function(element, options){
     this._mouseup_node = null;
     this._lastKeyDown = -1;
 
+    //listener
     this._svg.on('mousedown', this.mousedown.bind(this))
         .on('mousemove', this.mousemove.bind(this))
         .on('mouseup', this.mouseup.bind(this));
@@ -88,16 +80,12 @@ GraphEditor = function(element, options){
         .on('keydown', this.keydown.bind(this))
         .on('keyup', this.keyup.bind(this));
 
+    //initialize
     this.restart();
 };
 
-GraphEditor.prototype.resetMouseVars = function() {
-    this._mousedown_node = null;
-    this._mouseup_node = null;
-    this._mousedown_link = null;
-};
-
 GraphEditor.prototype.tick = function() {
+    //update path position
     this._path.attr('d', function(d) {
         var deltaX = d.target.x - d.source.x,
             deltaY = d.target.y - d.source.y,
@@ -114,6 +102,7 @@ GraphEditor.prototype.tick = function() {
         return 'M' + sourceX + ',' + sourceY + 'L' + targetX + ',' + targetY;
     });
 
+    //update circle position
     this._circle.attr('transform', function(d) {
         return 'translate(' + d.x + ',' + d.y + ')';
     });
@@ -124,10 +113,12 @@ GraphEditor.prototype.restart = function restart() {
 
     this._path = this._path.data(this._links);
 
+    //update section (path)
     this._path.classed('selected', function(d) { return d === self._selected_link; })
         .style('marker-start', function(d) { return d.left ? 'url(#start-arrow)' : ''; })
         .style('marker-end', function(d) { return d.right ? 'url(#end-arrow)' : ''; });
 
+    //enter section (path)
     this._path.enter().append('svg:path')
         .attr('class', 'link')
         .classed('selected', function(d) { return d === self._selected_link; })
@@ -135,14 +126,17 @@ GraphEditor.prototype.restart = function restart() {
         .style('marker-end', function(d) { return d.right ? 'url(#end-arrow)' : ''; })
         .on('mousedown', this.mousePathUp.bind(self));
 
+    //exit section (path)
     this._path.exit().remove();
 
     this._circle = this._circle.data(this._nodes, function(d) { return d.id; });
 
+    //update section circle
     this._circle.selectAll('circle')
         .style('fill', function(d) { return (d === self._selected_node) ? d3.rgb(self._color(d.id)).brighter().toString() : self._color(d.id); })
         .classed('reflexive', function(d) { return d.reflexive; });
 
+    //enter section circle
     var g = this._circle.enter().append('svg:g');
 
     g.append('svg:circle')
@@ -160,51 +154,60 @@ GraphEditor.prototype.restart = function restart() {
         .attr('class', 'id')
         .text(function(d) { return d.id; });
 
+    //exit section circle
     this._circle.exit().remove();
 
+    //start force
     this._force.start();
 };
 
 GraphEditor.prototype.mousedown = function() {
-    this._svg.classed('active', true);
-
+    //return if ctrl was pressed or a circle or link already selected (prevent multiple selec)
     if(d3.event.ctrlKey || this._mousedown_node || this._mousedown_link) return;
 
+    //add circle
     var point = d3.mouse(this._svg.node()),
-        node = {id: ++this._lastNodeId, reflexive: false};
+        node = {id: ++this._lastNodeID, reflexive: false};
         node.x = point[0];
         node.y = point[1];
-        this._nodes.push(node);
 
+    this._nodes.push(node);
     this.restart();
 };
 
 GraphEditor.prototype.mousemove = function() {
+    //return if dragline was not started on a circle
     if(!this._mousedown_node) return;
 
+    //draw dragline
     this._drag_line.attr('d', 'M' + this._mousedown_node.x + ',' + this._mousedown_node.y + 'L' + d3.mouse(this._svg.node())[0] + ',' + d3.mouse(this._svg.node())[1]);
     this.restart();
 };
 
 GraphEditor.prototype.mouseup = function() {
+    //hide drag line (defa)
     if(this._mousedown_node) {
         this._drag_line
         .classed('hidden', true)
         .style('marker-end', '');
     }
 
-    this._svg.classed('active', false);
     this.resetMouseVars();
 };
 
 GraphEditor.prototype.mouseCircleDown = function(d){
     if(d3.event.ctrlKey) return;
 
+    //select or deselect node (and deselect link)
     this._mousedown_node = d;
-    if(this._mousedown_node === this._selected_node) this._selected_node = null;
-    else this._selected_node = this._mousedown_node;
+    if(this._mousedown_node === this._selected_node){
+        this._selected_node = null;
+    }else{
+        this._selected_node = this._mousedown_node;
+    }
     this._selected_link = null;
 
+    //show drag line
     this._drag_line
         .style('marker-end', 'url(#end-arrow)')
         .classed('hidden', false)
@@ -216,14 +219,14 @@ GraphEditor.prototype.mouseCircleDown = function(d){
 GraphEditor.prototype.mouseCircleUp = function(d){
     if(!this._mousedown_node) return;
 
-    this._drag_line
-        .classed('hidden', true)
-        .style('marker-end', '');
-
+    //return if it is still the same circle
     this._mouseup_node = d;
-    if(this._mouseup_node === this._mousedown_node) { this.resetMouseVars(); return; }
+    if(this._mouseup_node === this._mousedown_node) {
+        this.resetMouseVars();
+        return;
+    }
 
-
+    //define source target
     var source, target, direction;
     if(this._mousedown_node.id < this._mouseup_node.id) {
         source = this._mousedown_node;
@@ -235,11 +238,13 @@ GraphEditor.prototype.mouseCircleUp = function(d){
         direction = 'left';
     }
 
+    //get ore create link
     var link;
     link = this._links.filter(function(l) {
         return (l.source === source && l.target === target);
     })[0];
 
+    //set link values
     if(link) {
         link[direction] = true;
     } else {
@@ -254,23 +259,20 @@ GraphEditor.prototype.mouseCircleUp = function(d){
 };
 
 GraphEditor.prototype.mousePathUp = function(d){
+
+    //if ctrl is pressed return
     if(d3.event.ctrlKey) return;
+
+    //select or deselect link (and also deselect node)
     this._mousedown_link = d;
-    if(this._mousedown_link === this._selected_link) this._selected_link = null;
-    else this._selected_link = this._mousedown_link;
+    if(this._mousedown_link === this._selected_link){
+        this._selected_link = null;
+    }else{
+        this._selected_link = this._mousedown_link;
+    }
     this._selected_node = null;
+
     this.restart();
-};
-
-GraphEditor.prototype.spliceLinksForNode = function(node) {
-    var self = this;
-    var toSplice = this._links.filter(function(l) {
-        return (l.source === node || l.target === node);
-    });
-
-    toSplice.map(function(l) {
-        self._links.splice(self._links.indexOf(l), 1);
-    });
 };
 
 GraphEditor.prototype.keydown = function() {
@@ -286,8 +288,10 @@ GraphEditor.prototype.keydown = function() {
         this._svg.classed('ctrl', true);
     }
 
+    //if no link or node was selected return
     if(!this._selected_node && !this._selected_link) return;
 
+    //check keyCode
     switch(d3.event.keyCode) {
         //delete or backsprace
         case 8:
@@ -338,10 +342,31 @@ GraphEditor.prototype.keydown = function() {
 GraphEditor.prototype.keyup = function() {
     this._lastKeyDown = -1;
 
+    //do not drag after ctrl was released
     if(d3.event.keyCode === 17) {
         this._circle
         .on('mousedown.drag', null)
         .on('touchstart.drag', null);
         this._svg.classed('ctrl', false);
     }
+};
+
+GraphEditor.prototype.spliceLinksForNode = function(node) {
+    var self = this;
+
+    //get all links which are connected
+    var toSplice = this._links.filter(function(l) {
+        return (l.source === node || l.target === node);
+    });
+
+    //remove them from list
+    toSplice.map(function(l) {
+        self._links.splice(self._links.indexOf(l), 1);
+    });
+};
+
+GraphEditor.prototype.resetMouseVars = function() {
+    this._mousedown_node = null;
+    this._mouseup_node = null;
+    this._mousedown_link = null;
 };
