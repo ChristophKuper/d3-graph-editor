@@ -1,0 +1,20 @@
+{
+  "name": "d3-graphEditor",
+  "version": "0.0.0",
+  "description": "a d3.js graph editor",
+  "main": "server.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node server.js"
+  },
+  "keywords": [
+    "d3.js",
+    "graph",
+    "editor"
+  ],
+  "author": "Christoph Kuper",
+  "license": "GPLv3",
+  "dependencies": {
+    "express": "~4.12.4"
+  }
+}
