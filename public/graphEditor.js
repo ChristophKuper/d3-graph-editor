@@ -227,6 +227,11 @@ GraphEditor.prototype.mouseCircleDown = function(d){
 GraphEditor.prototype.mouseCircleUp = function(d){
     if(!this._mousedown_node) return;
 
+    //hide drag line and arrow
+    this._drag_line
+        .classed('hidden', true)
+        .style('marker-end', '');
+
     //return if it is still the same circle
     this._mouseup_node = d;
     if(this._mouseup_node === this._mousedown_node) {
