@@ -6,9 +6,11 @@ GraphEditor = function(element, options){
 
     this._options = options || {};
 
-    this._div    = element || "";
-    this._width  = this._options.width  || 500;
-    this._height = this._options.height || 500;
+    this._div           = element                    || "";
+    this._width         = this._options.width        || 500;
+    this._height        = this._options.height       || 500;
+    this._charge        = this._options.carge        || -500;
+    this._linkDistance  = this._options.linkDistance || 150;
 
     this._color = colors = d3.scale.category10();
 
@@ -60,8 +62,8 @@ GraphEditor = function(element, options){
         .nodes(this._nodes)
         .links(this._links)
         .size([this._width, this._height])
-        .linkDistance(150)
-        .charge(-500)
+        .linkDistance(this._linkDistance)
+        .charge(this._charge)
         .on('tick', this.tick.bind(this));
 
     this._path = this._svg.append('svg:g').selectAll('path');
@@ -127,14 +129,7 @@ GraphEditor.prototype.restart = function restart() {
         .classed('selected', function(d) { return d === self._selected_link; })
         .style('marker-start', function(d) { return d.left ? 'url(#start-arrow)' : ''; })
         .style('marker-end', function(d) { return d.right ? 'url(#end-arrow)' : ''; })
-        .on('mousedown', function(d) {
-          if(d3.event.ctrlKey) return;
-          self._mousedown_link = d;
-          if(self._mousedown_link === self._selected_link) self._selected_link = null;
-          else self._selected_link = self._mousedown_link;
-          self._selected_node = null;
-          self.restart();
-    });
+        .on('mousedown', this.mousePathUp.bind(self));
 
     this._path.exit().remove();
 
@@ -152,91 +147,17 @@ GraphEditor.prototype.restart = function restart() {
         .style('fill', function(d) { return (d === self._selected_node) ? d3.rgb(colors(d.id)).brighter().toString() : colors(d.id); })
         .style('stroke', function(d) { return d3.rgb(colors(d.id)).darker().toString(); })
         .classed('reflexive', function(d) { return d.reflexive; })
-        .on('mouseover', function(d) {
-            if(!self._mousedown_node || d === self._mousedown_node) return;
-            // enlarge target node
-            d3.select(this).attr('transform', 'scale(1.1)');
-        })
-        .on('mouseout', function(d) {
-            if(!self._mousedown_node || d === self._mousedown_node) return;
-            // unenlarge target node
-            d3.select(this).attr('transform', '');
-        })
-        .on('mousedown', function(d) {
-            if(d3.event.ctrlKey) return;
+        .on('mousedown', this.mouseCircleDown.bind(self))
+        .on('mouseup', this.mouseCircleUp.bind(self));
 
-            // select node
-            self._mousedown_node = d;
-            if(self._mousedown_node === self._selected_node) self._selected_node = null;
-            else self._selected_node = self._mousedown_node;
-            self._selected_link = null;
-
-            // reposition drag line
-            self._drag_line
-                .style('marker-end', 'url(#end-arrow)')
-                .classed('hidden', false)
-                .attr('d', 'M' + self._mousedown_node.x + ',' + self._mousedown_node.y + 'L' + self._mousedown_node.x + ',' + self._mousedown_node.y);
-
-           self.restart();
-        })
-        .on('mouseup', function(d) {
-            if(!self._mousedown_node) return;
-
-            // needed by FF
-            self._drag_line
-                .classed('hidden', true)
-                .style('marker-end', '');
-
-            // check for drag-to-self
-            self._mouseup_node = d;
-            if(self._mouseup_node === self._mousedown_node) { self.resetMouseVars(); return; }
-
-            // unenlarge target node
-            d3.select(this).attr('transform', '');
-
-            // add link to graph (update if exists)
-            // NB: links are strictly source < target; arrows separately specified by booleans
-            var source, target, direction;
-            if(self._mousedown_node.id < self._mouseup_node.id) {
-                source = self._mousedown_node;
-                target = self._mouseup_node;
-                direction = 'right';
-            } else {
-                source = self._mouseup_node;
-                target = self._mousedown_node;
-                direction = 'left';
-            }
-
-            var link;
-            link = self._links.filter(function(l) {
-                return (l.source === source && l.target === target);
-            })[0];
-
-            if(link) {
-                link[direction] = true;
-            } else {
-                link = {source: source, target: target, left: false, right: false};
-                link[direction] = true;
-                self._links.push(link);
-            }
-
-            // select new link
-            self._selected_link = link;
-            self._selected_node = null;
-            self.restart();
-        });
-
-        // show node IDs
     g.append('svg:text')
         .attr('x', 0)
         .attr('y', 4)
         .attr('class', 'id')
         .text(function(d) { return d.id; });
 
-    // remove old nodes
     this._circle.exit().remove();
 
-    // set the graph in motion
     this._force.start();
 };
 
@@ -255,103 +176,168 @@ GraphEditor.prototype.mousedown = function() {
 };
 
 GraphEditor.prototype.mousemove = function() {
-  if(!this._mousedown_node) return;
+    if(!this._mousedown_node) return;
 
-  // update drag line
-  this._drag_line.attr('d', 'M' + this._mousedown_node.x + ',' + this._mousedown_node.y + 'L' + d3.mouse(this._svg.node())[0] + ',' + d3.mouse(this._svg.node())[1]);
-
-  this.restart();
+    this._drag_line.attr('d', 'M' + this._mousedown_node.x + ',' + this._mousedown_node.y + 'L' + d3.mouse(this._svg.node())[0] + ',' + d3.mouse(this._svg.node())[1]);
+    this.restart();
 };
 
 GraphEditor.prototype.mouseup = function() {
-  if(this._mousedown_node) {
-    // hide drag line
+    if(this._mousedown_node) {
+        this._drag_line
+        .classed('hidden', true)
+        .style('marker-end', '');
+    }
+
+    this._svg.classed('active', false);
+    this.resetMouseVars();
+};
+
+GraphEditor.prototype.mouseCircleDown = function(d){
+    if(d3.event.ctrlKey) return;
+
+    this._mousedown_node = d;
+    if(this._mousedown_node === this._selected_node) this._selected_node = null;
+    else this._selected_node = this._mousedown_node;
+    this._selected_link = null;
+
     this._drag_line
-      .classed('hidden', true)
-      .style('marker-end', '');
-  }
+        .style('marker-end', 'url(#end-arrow)')
+        .classed('hidden', false)
+        .attr('d', 'M' + this._mousedown_node.x + ',' + this._mousedown_node.y + 'L' + this._mousedown_node.x + ',' + this._mousedown_node.y);
 
-  // because :active only works in WebKit?
-  this._svg.classed('active', false);
+    this.restart();
+};
 
-  // clear mouse event vars
-  this.resetMouseVars();
+GraphEditor.prototype.mouseCircleUp = function(d){
+    if(!this._mousedown_node) return;
+
+    this._drag_line
+        .classed('hidden', true)
+        .style('marker-end', '');
+
+    this._mouseup_node = d;
+    if(this._mouseup_node === this._mousedown_node) { this.resetMouseVars(); return; }
+
+
+    var source, target, direction;
+    if(this._mousedown_node.id < this._mouseup_node.id) {
+        source = this._mousedown_node;
+        target = this._mouseup_node;
+        direction = 'right';
+    } else {
+        source = this._mouseup_node;
+        target = this._mousedown_node;
+        direction = 'left';
+    }
+
+    var link;
+    link = this._links.filter(function(l) {
+        return (l.source === source && l.target === target);
+    })[0];
+
+    if(link) {
+        link[direction] = true;
+    } else {
+        link = {source: source, target: target, left: false, right: false};
+        link[direction] = true;
+        this._links.push(link);
+    }
+
+    this._selected_link = link;
+    this._selected_node = null;
+    this.restart();
+};
+
+GraphEditor.prototype.mousePathUp = function(d){
+    if(d3.event.ctrlKey) return;
+    this._mousedown_link = d;
+    if(this._mousedown_link === this._selected_link) this._selected_link = null;
+    else this._selected_link = this._mousedown_link;
+    this._selected_node = null;
+    this.restart();
 };
 
 GraphEditor.prototype.spliceLinksForNode = function(node) {
     var self = this;
-  var toSplice = this._links.filter(function(l) {
-    return (l.source === node || l.target === node);
-  });
-  toSplice.map(function(l) {
-      self._links.splice(self._links.indexOf(l), 1);
-  });
+    var toSplice = this._links.filter(function(l) {
+        return (l.source === node || l.target === node);
+    });
+
+    toSplice.map(function(l) {
+        self._links.splice(self._links.indexOf(l), 1);
+    });
 };
 
 GraphEditor.prototype.keydown = function() {
-  d3.event.preventDefault();
 
-  if(this._lastKeyDown !== -1) return;
-  this._lastKeyDown = d3.event.keyCode;
+    //general
+    d3.event.preventDefault();
+    if(this._lastKeyDown !== -1) return;
+    this._lastKeyDown = d3.event.keyCode;
 
-  // ctrl
-  if(d3.event.keyCode === 17) {
-    this._circle.call(this._force.drag);
-    this._svg.classed('ctrl', true);
-  }
+    // ctrl
+    if(d3.event.keyCode === 17) {
+        this._circle.call(this._force.drag);
+        this._svg.classed('ctrl', true);
+    }
 
-  if(!this._selected_node && !this._selected_link) return;
-  switch(d3.event.keyCode) {
-    case 8: // backspace
-    case 46: // delete
-      if(this._selected_node) {
-        this._nodes.splice(this._nodes.indexOf(this._selected_node), 1);
-        this.spliceLinksForNode(this._selected_node);
-      } else if(this._selected_link) {
-          this._links.splice(this._links.indexOf(this._selected_link), 1);
-      }
-      this._selected_link = null;
-      this._selected_node = null;
-     this.restart();
-      break;
-    case 66: // B
-      if(this._selected_link) {
-        // set link direction to both left and right
-        this._selected_link.left = true;
-        this._selected_link.right = true;
-      }
-     this.restart();
-      break;
-    case 76: // L
-      if(this._selected_link) {
-        // set link direction to left only
-        this._selected_link.left = true;
-        this._selected_link.right = false;
-      }
-     this.restart();
-      break;
-    case 82: // R
-      if(this._selected_node) {
-        // toggle node reflexivity
-        this._selected_node.reflexive = !this._selected_node.reflexive;
-    } else if(this._selected_link) {
-        // set link direction to right only
-        this._selected_link.left = false;
-        this._selected_link.right = true;
-      }
-     this.restart();
-      break;
-  }
+    if(!this._selected_node && !this._selected_link) return;
+
+    switch(d3.event.keyCode) {
+        //delete or backsprace
+        case 8:
+        case 46:
+            if(this._selected_node) {
+                this._nodes.splice(this._nodes.indexOf(this._selected_node), 1);
+                this.spliceLinksForNode(this._selected_node);
+            } else if(this._selected_link) {
+                this._links.splice(this._links.indexOf(this._selected_link), 1);
+            }
+
+            this._selected_link = null;
+            this._selected_node = null;
+            this.restart();
+            break;
+
+        //B (both)
+        case 66:
+            if(this._selected_link) {
+                this._selected_link.left = true;
+                this._selected_link.right = true;
+            }
+            this.restart();
+            break;
+
+        //L (left)
+        case 76:
+            if(this._selected_link) {
+                this._selected_link.left = true;
+                this._selected_link.right = false;
+            }
+            this.restart();
+            break;
+
+        //R (right)
+        case 82:
+            if(this._selected_node) {
+                this._selected_node.reflexive = !this._selected_node.reflexive;
+            } else if(this._selected_link) {
+                this._selected_link.left = false;
+                this._selected_link.right = true;
+            }
+        this.restart();
+        break;
+    }
 };
 
 GraphEditor.prototype.keyup = function() {
-  this._lastKeyDown = -1;
+    this._lastKeyDown = -1;
 
-  // ctrl
-  if(d3.event.keyCode === 17) {
-    this._circle
-      .on('mousedown.drag', null)
-      .on('touchstart.drag', null);
-    this._svg.classed('ctrl', false);
-  }
+    if(d3.event.keyCode === 17) {
+        this._circle
+        .on('mousedown.drag', null)
+        .on('touchstart.drag', null);
+        this._svg.classed('ctrl', false);
+    }
 };
