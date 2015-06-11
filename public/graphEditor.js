@@ -94,7 +94,7 @@ GraphEditor = function(element, options){
     this.restart();
 };
 
-GraphEditor.prototype.tick = function() {
+GraphEditor.prototype.tick = function(){
     //update path position
     this._path.attr('d', function(d) {
         var deltaX = d.target.x - d.source.x,
@@ -118,7 +118,7 @@ GraphEditor.prototype.tick = function() {
     });
 };
 
-GraphEditor.prototype.restart = function restart() {
+GraphEditor.prototype.restart = function restart(){
     var self = this;
 
     this._path = this._path.data(this._links);
@@ -139,7 +139,7 @@ GraphEditor.prototype.restart = function restart() {
     //exit section (path)
     this._path.exit().remove();
 
-    this._circle = this._circle.data(this._nodes, function(d) { return d.id; });
+    this._circle = this._circle.data(this._nodes, function(d) { return self._nodes.indexOf(d); });
 
     //update section circle
     this._circle.selectAll('circle')
@@ -173,6 +173,7 @@ GraphEditor.prototype.restart = function restart() {
 
 GraphEditor.prototype.addNode = function(options){
     //node settings
+    options = options || {};
     var id        = options.id          || ++this._lastNodeID;
     var x         = options.x           || 200;
     var y         = options.y           || 200;
@@ -212,7 +213,7 @@ GraphEditor.prototype.addLink = function(options){
     this.restart();
 };
 
-GraphEditor.prototype.mousedown = function() {
+GraphEditor.prototype.mousedown = function(){
     //return if ctrl was pressed or a circle or link already selected (prevent multiple selec)
     if(d3.event.ctrlKey || this._mousedown_node || this._mousedown_link) return;
 
@@ -220,7 +221,7 @@ GraphEditor.prototype.mousedown = function() {
     this.addNode({x : point[0], y : point[1]});
 };
 
-GraphEditor.prototype.mousemove = function() {
+GraphEditor.prototype.mousemove = function(){
     //return if dragline was not started on a circle
     if(!this._mousedown_node) return;
 
@@ -229,7 +230,7 @@ GraphEditor.prototype.mousemove = function() {
     this.restart();
 };
 
-GraphEditor.prototype.mouseup = function() {
+GraphEditor.prototype.mouseup = function(){
     //hide drag line (defa)
     if(this._mousedown_node) {
         this._drag_line
@@ -308,7 +309,7 @@ GraphEditor.prototype.mousePathUp = function(d){
     this.restart();
 };
 
-GraphEditor.prototype.keydown = function() {
+GraphEditor.prototype.keydown = function(){
 
     //general
     d3.event.preventDefault();
@@ -372,7 +373,7 @@ GraphEditor.prototype.keydown = function() {
     }
 };
 
-GraphEditor.prototype.keyup = function() {
+GraphEditor.prototype.keyup = function(){
     this._lastKeyDown = -1;
 
     //do not drag after ctrl was released
@@ -384,7 +385,7 @@ GraphEditor.prototype.keyup = function() {
     }
 };
 
-GraphEditor.prototype.spliceLinksForNode = function(node) {
+GraphEditor.prototype.spliceLinksForNode = function(node){
     var self = this;
 
     //get all links which are connected
@@ -398,7 +399,7 @@ GraphEditor.prototype.spliceLinksForNode = function(node) {
     });
 };
 
-GraphEditor.prototype.resetMouseVars = function() {
+GraphEditor.prototype.resetMouseVars = function(){
     this._mousedown_node = null;
     this._mouseup_node = null;
     this._mousedown_link = null;

@@ -10,6 +10,8 @@
 <body>
     <h1>D3.js Graph Editor</h1>
     </p>
+    <button id="add">Add</button>
+    <button id="reload">Reload</button>
     <div id="graphEditor"></div>
     <script type="text/javascript">
         //graph editor example
@@ -27,6 +29,15 @@
             ];
 
             var editor = new GraphEditor("#graphEditor",  {nodes : nodes, links : links, lastNodeID : 2});
+
+            $("#add").on("click", function(){
+                editor.addNode({id: 1});                
+            })
+
+            $("#reload").on("click", function(){
+                editor.reload({nodes : nodes, links : links, lastNodeID : 2});
+            });
+
         });
     </script>
 </body>
