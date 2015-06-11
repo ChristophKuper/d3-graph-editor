@@ -2,6 +2,8 @@
  * This is a D3.js Graph Editor Modul
  * which was extended from http://bl.ocks.org/rkirsling/5001347
  *
+ * TODO bounding box and gravity
+ *
 **/
 GraphEditor = function(element, options){
 
@@ -169,18 +171,53 @@ GraphEditor.prototype.restart = function restart() {
     this._force.start();
 };
 
+GraphEditor.prototype.addNode = function(options){
+    //node settings
+    var id        = options.id          || ++this._lastNodeID;
+    var x         = options.x           || 200;
+    var y         = options.y           || 200;
+    var reflexive = options.reflexive   || false;
+
+    //create node
+    var node = {id: id, reflexive: reflexive};
+    node.x = x;
+    node.y = y;
+
+    this._nodes.push(node);
+    this.restart();
+};
+
+GraphEditor.prototype.addLink = function(options){
+
+    if(!options.source || !options.target || !options.direction)
+        return;
+
+    //get ore create link
+    var link;
+    link = this._links.filter(function(l) {
+        return (l.source === options.source && l.target === options.target);
+    })[0];
+
+    //set link values
+    if(link) {
+        link[options.direction] = true;
+    } else {
+        link = {source: options.source, target: options.target, left: false, right: false};
+        link[options.direction] = true;
+        this._links.push(link);
+    }
+
+    this._selected_link = link;
+    this._selected_node = null;
+    this.restart();
+};
+
 GraphEditor.prototype.mousedown = function() {
     //return if ctrl was pressed or a circle or link already selected (prevent multiple selec)
     if(d3.event.ctrlKey || this._mousedown_node || this._mousedown_link) return;
 
-    //add circle
-    var point = d3.mouse(this._svg.node()),
-        node = {id: ++this._lastNodeID, reflexive: false};
-        node.x = point[0];
-        node.y = point[1];
-
-    this._nodes.push(node);
-    this.restart();
+    var point = d3.mouse(this._svg.node());
+    this.addNode({x : point[0], y : point[1]});
 };
 
 GraphEditor.prototype.mousemove = function() {
@@ -251,24 +288,7 @@ GraphEditor.prototype.mouseCircleUp = function(d){
         direction = 'left';
     }
 
-    //get ore create link
-    var link;
-    link = this._links.filter(function(l) {
-        return (l.source === source && l.target === target);
-    })[0];
-
-    //set link values
-    if(link) {
-        link[direction] = true;
-    } else {
-        link = {source: source, target: target, left: false, right: false};
-        link[direction] = true;
-        this._links.push(link);
-    }
-
-    this._selected_link = link;
-    this._selected_node = null;
-    this.restart();
+    this.addLink({source : source, target : target, direction : direction});
 };
 
 GraphEditor.prototype.mousePathUp = function(d){
