@@ -12,35 +12,35 @@
   cursor: crosshair;
 }
 
-.graphEditor_path.link {
+.graphEditor_path {
   fill: none;
   stroke: #888888;
   stroke-width: 1px;
   cursor: default;
 }
 
-.graphEditor_svg:not(.active):not(.ctrl) .graphEditor_path.link {
+.graphEditor_svg:not(.active):not(.ctrl) .graphEditor_path {
   cursor: pointer;
 }
 
-.graphEditor_path.link.selected {
+.graphEditor_path.selected {
   stroke-dasharray: 10,2;
 }
 
-.graphEditor_path.link.dragline {
+.graphEditor_path.dragline {
   pointer-events: none;
 }
 
-.graphEditor_path.link.hidden {
+.graphEditor_path.hidden {
   stroke-width: 0;
 }
 
-.graphEditor_circle.node {
+.graphEditor_circle {
   stroke-width: 1.5px;
   cursor: pointer;
 }
 
-.graphEditor_circle.node.reflexive {
+.graphEditor_circle.reflexive {
   stroke: #000 !important;
   stroke-width: 2.5px;
 }

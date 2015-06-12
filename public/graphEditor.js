@@ -8,6 +8,7 @@
  * TODO kantengewichte
  * TODO visualize graph algorithms
  * TODO custom coloring
+ * TODO stop charge on drag
  *
 **/
 GraphEditor = function(element, options){
@@ -66,7 +67,7 @@ GraphEditor = function(element, options){
 
     //drag line
     this._drag_line = this._svg.append('svg:path')
-        .attr('class', 'graphEditor_path link dragline hidden')
+        .attr('class', 'graphEditor_path dragline hidden')
         .attr('d', 'M0,0L0,0');
 
     //layout
@@ -139,7 +140,7 @@ GraphEditor.prototype.restart = function restart(){
 
     //enter section (path)
     this._path.enter().append('svg:path')
-        .attr('class', 'graphEditor_path link')
+        .attr('class', 'graphEditor_path')
         .classed('selected', function(d) { return d === self._selected_link; })
         .style('marker-start', function(d) { return d.left ? 'url(#start-arrow)' : ''; })
         .style('marker-end', function(d) { return d.right ? 'url(#end-arrow)' : ''; })
@@ -159,7 +160,7 @@ GraphEditor.prototype.restart = function restart(){
     var g = this._circle.enter().append('svg:g');
 
     g.append('svg:circle')
-        .attr('class', 'graphEditor_circle node')
+        .attr('class', 'graphEditor_circle')
         .attr('r', this._radius)
         .style('fill', function(d) { return (d === self._selected_node) ? d3.rgb(self._color(d.id)).brighter().toString() : self._color(d.id); })
         .style('stroke', function(d) { return d3.rgb(self._color(d.id)).darker().toString(); })
