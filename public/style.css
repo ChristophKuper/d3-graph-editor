@@ -14,8 +14,8 @@
 
 .graphEditor_path.link {
   fill: none;
-  stroke: #000;
-  stroke-width: 4px;
+  stroke: #888888;
+  stroke-width: 1px;
   cursor: default;
 }
 

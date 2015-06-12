@@ -10,50 +10,34 @@
 <body>
     <h1>D3.js Graph Editor</h1>
     </p>
-    <button id="print">Print Nodes</button>
-    <button id="add">Add</button>
-    <button id="reload">Reload</button>
     <div id="graphEditor"></div>
+
     <script type="text/javascript">
-        //graph editor example
         $(function(){
 
-            var nodes = [
-                {id: 0, reflexive: false},
-                {id: 1, reflexive: true },
-                {id: 2, reflexive: false}
-            ];
+            d3.json("data.json", function(data){
 
-            var links = [
-                {source: nodes[0], target: nodes[1], left: false, right: true },
-                {source: nodes[1], target: nodes[2], left: false, right: true }
-            ];
+                var i=0;
+                data.nodes.forEach(function(entry){
+                    entry.id = ++i;
+                });
 
-            var newNodes = [
-                {id: 0, reflexive: false},
-                {id: 1, reflexive: true }
-            ];
+                data.links.forEach(function(entry){
+                    data.nodes.forEach(function(node){
+                        if(node.id === entry.source)
+                            entry.source = node;
+                        if(node.id === entry.target)
+                            entry.target = node;
+                    });
+                });
 
-            var newLinks = [
-                {source: newNodes[0], target: newNodes[1], left: false, right: true },
-            ];
+                console.log(data);
 
-            var editor = new GraphEditor("#graphEditor",  {nodes : nodes, links : links, lastNodeID : 2});
+                var editor = new GraphEditor("#graphEditor",  {nodes : data.nodes, links : data.links, lastNodeID : i});
 
-            $("#print").on("click", function(){
-                console.log(nodes);
-                console.log(links);
             });
-
-            $("#add").on("click", function(){
-                editor.addNode({id: 1});
-            })
-
-            $("#reload").on("click", function(){
-                editor.reload({nodes : newNodes, links : newLinks, lastNodeID : 1});
-            });
-
         });
     </script>
+
 </body>
 </html>

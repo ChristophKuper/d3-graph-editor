@@ -5,6 +5,9 @@
  * TODO bounding box and gravity
  * TODO reflexive mode
  * TODO zoom
+ * TODO kantengewichte
+ * TODO visualize graph algorithms
+ * TODO custom coloring
  *
 **/
 GraphEditor = function(element, options){
@@ -17,15 +20,15 @@ GraphEditor = function(element, options){
 
     //settings
     this._div           = element                    || "";
-    this._width         = this._options.width        || 500;
-    this._height        = this._options.height       || 500;
-    this._charge        = this._options.carge        || -500;
-    this._linkDistance  = this._options.linkDistance || 150;
+    this._width         = this._options.width        || 1000;
+    this._height        = this._options.height       || 1000;
+    this._charge        = this._options.carge        || -250;
+    this._linkDistance  = this._options.linkDistance || 75;
 
     //config
-    this._radius        = this._options.radius       || 12;
+    this._radius        = this._options.radius       || 8;
     this._mouseMode     = this._options.mouseMode    || true;
-    this._textMode      = this._options.textMode     || true;
+    this._textMode      = this._options.textMode     || false;
     this._color         = d3.scale.category10();
 
     //container
@@ -195,12 +198,10 @@ GraphEditor.prototype.reload = function reload(options){
 
         //searching the nodes
         self._nodes.forEach(function(node){
-            if(node.id === entry.source.id){
+            if(node.id === entry.source.id)
                 source = node;
-            }
-            if(node.id === entry.target.id){
+            if(node.id === entry.target.id)
                 target = node;
-            }
         });
         var link = {source : source, target : target, left : entry.left, right : entry.right};
         self._links.push(link);
