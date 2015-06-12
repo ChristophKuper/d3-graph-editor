@@ -38,7 +38,7 @@
                 {source: newNodes[0], target: newNodes[1], left: false, right: true }
             ];
 
-            var editor = new GraphEditor("#graphEditor",  {nodes : nodes, links : links, lastNodeID : 1});
+            var editor = new GraphEditor("#graphEditor",  {nodes : nodes, links : links, lastNodeID : 2});
 
             $("#print").on("click", function(){
                 console.log(nodes);
@@ -50,7 +50,7 @@
             })
 
             $("#reload").on("click", function(){
-                editor.reload({nodes : newNodes, links : newLinks, lastNodeID : 2});
+                editor.reload({nodes : newNodes, links : newLinks, lastNodeID : 1});
             });
 
         });

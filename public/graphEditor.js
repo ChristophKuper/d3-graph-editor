@@ -178,6 +178,8 @@ GraphEditor.prototype.reload = function reload(options){
     this._links.splice(0, this._links.length);
     this.restart();
 
+    this._lastNodeID = options.lastNodeID || 0;
+
     options.nodes.forEach(function(entry){
         self.addNode(entry);
     });
@@ -204,7 +206,7 @@ GraphEditor.prototype.addNode = function(options){
 
 GraphEditor.prototype.addLink = function(options){
 
-    if(!options.source || !options.target || !options.direction)
+    if(!options.source || !options.target)
         return;
 
     //get ore create link
@@ -215,10 +217,10 @@ GraphEditor.prototype.addLink = function(options){
 
     //set link values
     if(link) {
-        link[options.direction] = true;
+        link.left = options.left || link.left;
+        link.right = options.right || link.right;
     } else {
-        link = {source: options.source, target: options.target, left: false, right: false};
-        link[options.direction] = true;
+        link = {source: options.source, target: options.target, left: options.left, right: options.right};
         this._links.push(link);
     }
 
@@ -292,18 +294,20 @@ GraphEditor.prototype.mouseCircleUp = function(d){
     }
 
     //define source target
-    var source, target, direction;
+    var source, target, left, right;
     if(this._mousedown_node.id < this._mouseup_node.id) {
         source = this._mousedown_node;
         target = this._mouseup_node;
-        direction = 'right';
+        left = false;
+        right = true;
     } else {
         source = this._mouseup_node;
         target = this._mousedown_node;
-        direction = 'left';
+        left = true;
+        right = false;
     }
 
-    this.addLink({source : source, target : target, direction : direction});
+    this.addLink({source : source, target : target, left : left, right : right});
 };
 
 GraphEditor.prototype.mousePathUp = function(d){
