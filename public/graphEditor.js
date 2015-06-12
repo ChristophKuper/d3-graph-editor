@@ -3,6 +3,7 @@
  * which was extended from http://bl.ocks.org/rkirsling/5001347
  *
  * TODO bounding box and gravity
+ * TODO replace default x y
  *
 **/
 GraphEditor = function(element, options){
@@ -182,6 +183,22 @@ GraphEditor.prototype.reload = function reload(options){
 
     options.nodes.forEach(function(entry){
         self.addNode(entry);
+    });
+
+    options.links.forEach(function(entry){
+        var source, target;
+
+        //searching the nodes
+        self._nodes.forEach(function(node){
+            if(node.id === entry.source.id){
+                source = node;
+            }
+            if(node.id === entry.target.id){
+                target = node;
+            }
+        });
+        var link = {source : source, target : target, left : entry.left, right : entry.right};
+        self._links.push(link);
     });
 
     this.restart();
