@@ -3,7 +3,8 @@
  * which was extended from http://bl.ocks.org/rkirsling/5001347
  *
  * TODO bounding box and gravity
- * TODO replace default x y
+ * TODO reflexive mode
+ * TODO zoom
  *
 **/
 GraphEditor = function(element, options){
@@ -21,7 +22,11 @@ GraphEditor = function(element, options){
     this._charge        = this._options.carge        || -500;
     this._linkDistance  = this._options.linkDistance || 150;
 
-    this._color = d3.scale.category10();
+    //config
+    this._radius        = this._options.radius       || 12;
+    this._mouseMode     = this._options.mouseMode    || true;
+    this._textMode      = this._options.textMode     || true;
+    this._color         = d3.scale.category10();
 
     //container
     this._svg = d3.select(this._div)
@@ -152,7 +157,7 @@ GraphEditor.prototype.restart = function restart(){
 
     g.append('svg:circle')
         .attr('class', 'graphEditor_circle node')
-        .attr('r', 12)
+        .attr('r', this._radius)
         .style('fill', function(d) { return (d === self._selected_node) ? d3.rgb(self._color(d.id)).brighter().toString() : self._color(d.id); })
         .style('stroke', function(d) { return d3.rgb(self._color(d.id)).darker().toString(); })
         .classed('reflexive', function(d) { return d.reflexive; })
@@ -163,7 +168,7 @@ GraphEditor.prototype.restart = function restart(){
         .attr('class', 'graphEditor_circleText graphEditor_circleID')
         .attr('x', 0)
         .attr('y', 4)
-        .text(function(d) { return d.id; });
+        .text(function(d) { return self._textMode ? d.id : ""; });
 
     //exit section circle
     this._circle.exit().remove();
@@ -208,8 +213,8 @@ GraphEditor.prototype.addNode = function(options){
     //node settings
     options = options || {};
     var id        = !isNaN(options.id)  ?  options.id : ++this._lastNodeID;
-    var x         = options.x           || 200;
-    var y         = options.y           || 200;
+    var x         = options.x           || this._with/2;
+    var y         = options.y           || this._height/2;
     var reflexive = options.reflexive   || false;
 
     //create node
@@ -248,7 +253,7 @@ GraphEditor.prototype.addLink = function(options){
 
 GraphEditor.prototype.mousedown = function(){
     //return if ctrl was pressed or a circle or link already selected (prevent multiple selec)
-    if(d3.event.ctrlKey || this._mousedown_node || this._mousedown_link) return;
+    if(d3.event.ctrlKey || this._mousedown_node || this._mousedown_link || !this._mouseMode) return;
 
     var point = d3.mouse(this._svg.node());
     this.addNode({x : point[0], y : point[1]});
