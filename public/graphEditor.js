@@ -171,10 +171,24 @@ GraphEditor.prototype.restart = function restart(){
     this._force.start();
 };
 
+GraphEditor.prototype.reload = function reload(options){
+    var self = this;
+
+    this._nodes.splice(0, this._nodes.length);
+    this._links.splice(0, this._links.length);
+    this.restart();
+
+    options.nodes.forEach(function(entry){
+        self.addNode(entry);
+    });
+
+    this.restart();
+};
+
 GraphEditor.prototype.addNode = function(options){
     //node settings
     options = options || {};
-    var id        = options.id          || ++this._lastNodeID;
+    var id        = !isNaN(options.id)  ?  options.id : ++this._lastNodeID;
     var x         = options.x           || 200;
     var y         = options.y           || 200;
     var reflexive = options.reflexive   || false;

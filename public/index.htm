@@ -10,6 +10,7 @@
 <body>
     <h1>D3.js Graph Editor</h1>
     </p>
+    <button id="print">Print Nodes</button>
     <button id="add">Add</button>
     <button id="reload">Reload</button>
     <div id="graphEditor"></div>
@@ -17,25 +18,39 @@
         //graph editor example
         $(function(){
 
-            nodes = [
+            var nodes = [
                 {id: 0, reflexive: false},
                 {id: 1, reflexive: true },
                 {id: 2, reflexive: false}
             ];
 
-            links = [
+            var links = [
                 {source: nodes[0], target: nodes[1], left: false, right: true },
                 {source: nodes[1], target: nodes[2], left: false, right: true }
             ];
 
-            var editor = new GraphEditor("#graphEditor",  {nodes : nodes, links : links, lastNodeID : 2});
+            var newNodes = [
+                {id: 0, reflexive: false},
+                {id: 1, reflexive: true }
+            ];
+
+            var newLinks = [
+                {source: newNodes[0], target: newNodes[1], left: false, right: true }
+            ];
+
+            var editor = new GraphEditor("#graphEditor",  {nodes : nodes, links : links, lastNodeID : 1});
+
+            $("#print").on("click", function(){
+                console.log(nodes);
+                console.log(links);
+            });
 
             $("#add").on("click", function(){
-                editor.addNode({id: 1});                
+                editor.addNode({id: 1});
             })
 
             $("#reload").on("click", function(){
-                editor.reload({nodes : nodes, links : links, lastNodeID : 2});
+                editor.reload({nodes : newNodes, links : newLinks, lastNodeID : 2});
             });
 
         });
