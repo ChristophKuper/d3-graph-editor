@@ -31,8 +31,18 @@
                     });
                 });
 
-                console.log(data);
+                var nodes = [
+                    {id: 0, reflexive: false},
+                    {id: 1, reflexive: true },
+                    {id: 2, reflexive: false}
+                ];
 
+                var links = [
+                    {source: nodes[0], target: nodes[1], left: false, right: true },
+                    {source: nodes[1], target: nodes[2], left: false, right: true }
+                ];
+
+                var editor = new GraphEditor("#graphEditor",  {nodes : nodes, links : links, lastNodeID : 2});
                 var editor = new GraphEditor("#graphEditor",  {nodes : data.nodes, links : data.links, lastNodeID : i});
 
             });

@@ -9,6 +9,7 @@
  * TODO visualize graph algorithms
  * TODO custom coloring
  * TODO stop charge on drag
+ * TODO add link by id and add node if neccessary
  *
 **/
 GraphEditor = function(element, options){
@@ -21,15 +22,15 @@ GraphEditor = function(element, options){
 
     //settings
     this._div           = element                    || "";
-    this._width         = this._options.width        || 1000;
-    this._height        = this._options.height       || 1000;
-    this._charge        = this._options.carge        || -250;
-    this._linkDistance  = this._options.linkDistance || 75;
+    this._width         = this._options.width        || 500;
+    this._height        = this._options.height       || 500;
+    this._charge        = this._options.carge        || -500;
+    this._linkDistance  = this._options.linkDistance || 150;
 
     //config
-    this._radius        = this._options.radius       || 8;
+    this._radius        = this._options.radius       || 12;
     this._mouseMode     = this._options.mouseMode    || true;
-    this._textMode      = this._options.textMode     || false;
+    this._textMode      = this._options.textMode     || true;
     this._color         = d3.scale.category10();
 
     //container
@@ -67,7 +68,7 @@ GraphEditor = function(element, options){
 
     //drag line
     this._drag_line = this._svg.append('svg:path')
-        .attr('class', 'graphEditor_path dragline hidden')
+        .attr('class', 'graphEditor_path link dragline hidden')
         .attr('d', 'M0,0L0,0');
 
     //layout
@@ -140,7 +141,7 @@ GraphEditor.prototype.restart = function restart(){
 
     //enter section (path)
     this._path.enter().append('svg:path')
-        .attr('class', 'graphEditor_path')
+        .attr('class', 'graphEditor_path link')
         .classed('selected', function(d) { return d === self._selected_link; })
         .style('marker-start', function(d) { return d.left ? 'url(#start-arrow)' : ''; })
         .style('marker-end', function(d) { return d.right ? 'url(#end-arrow)' : ''; })
@@ -160,7 +161,7 @@ GraphEditor.prototype.restart = function restart(){
     var g = this._circle.enter().append('svg:g');
 
     g.append('svg:circle')
-        .attr('class', 'graphEditor_circle')
+        .attr('class', 'graphEditor_circle node')
         .attr('r', this._radius)
         .style('fill', function(d) { return (d === self._selected_node) ? d3.rgb(self._color(d.id)).brighter().toString() : self._color(d.id); })
         .style('stroke', function(d) { return d3.rgb(self._color(d.id)).darker().toString(); })
