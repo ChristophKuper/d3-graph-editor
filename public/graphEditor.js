@@ -10,6 +10,9 @@
  * TODO custom coloring
  * TODO stop charge on drag
  * TODO add link by id and add node if neccessary
+ * TODO add all link properties
+ * TODO improve reload
+ * TODO id or index mode
  *
 **/
 GraphEditor = function(element, options){
@@ -185,6 +188,22 @@ GraphEditor.prototype.restart = function restart(){
 GraphEditor.prototype.reload = function reload(options){
     var self = this;
 
+    this._force.stop();
+    this._nodes = options.nodes;
+    this._links = options.links;
+    this._lastNodeID = options.lastNodeID || 0;
+
+    this._force = d3.layout.force()
+        .nodes(this._nodes)
+        .links(this._links)
+        .size([this._width, this._height])
+        .linkDistance(this._linkDistance)
+        .charge(this._charge)
+        .on('tick', this.tick.bind(this));
+
+    this.restart();
+
+    /** deprecated and buggy
     this._nodes.splice(0, this._nodes.length);
     this._links.splice(0, this._links.length);
     this.restart();
@@ -196,34 +215,23 @@ GraphEditor.prototype.reload = function reload(options){
     });
 
     options.links.forEach(function(entry){
-        var source, target;
-
-        //searching the nodes
-        self._nodes.forEach(function(node){
-            if(node.id === entry.source.id)
-                source = node;
-            if(node.id === entry.target.id)
-                target = node;
-        });
-        var link = {source : source, target : target, left : entry.left, right : entry.right};
-        self._links.push(link);
+        //self.addLink(entry);
     });
-
-    this.restart();
+    **/
 };
 
 GraphEditor.prototype.addNode = function(options){
-    //node settings
-    options = options || {};
-    var id        = !isNaN(options.id)  ?  options.id : ++this._lastNodeID;
-    var x         = options.x           || this._with/2;
-    var y         = options.y           || this._height/2;
-    var reflexive = options.reflexive   || false;
-
     //create node
-    var node = {id: id, reflexive: reflexive};
-    node.x = x;
-    node.y = y;
+    options = options || {};
+    var node        = {};
+
+    for(var prop in options)
+        node[prop]=options[prop];
+
+    node.id         = !isNaN(options.id)  ?  options.id : ++this._lastNodeID;
+    node.reflexive  = options.reflexive   || false;
+    node.x          = options.x           || this._with/2 + Math.random();
+    node.y          = options.y           || this._height/2 + Math.random();
 
     this._nodes.push(node);
     this.restart();

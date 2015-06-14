@@ -17,6 +17,7 @@
 
             d3.json("data.json", function(data){
 
+                //complex data
                 var i=0;
                 data.nodes.forEach(function(entry){
                     entry.id = ++i;
@@ -31,6 +32,7 @@
                     });
                 });
 
+                //inital data
                 var nodes = [
                     {id: 0, reflexive: false},
                     {id: 1, reflexive: true },
@@ -42,7 +44,24 @@
                     {source: nodes[1], target: nodes[2], left: false, right: true }
                 ];
 
+                //reload data
+                var newnodes = [
+                    {id: 1, test:"test", reflexive: false},
+                    {id: 1, reflexive: true }
+                ];
+
+                var newlinks = [
+                    {source: newnodes[0], target: newnodes[1], left: false, right: true }
+                ];
+
+                //testing
                 var editor = new GraphEditor("#graphEditor",  {nodes : nodes, links : links, lastNodeID : 2});
+
+                //reload test
+                setTimeout(function(){
+                    editor.reload({nodes: newnodes, links: newlinks, lastNodeID : 1});
+                }, 3000);
+
                 //var editor = new GraphEditor("#graphEditor",  {nodes : data.nodes, links : data.links, lastNodeID : i});
 
             });
