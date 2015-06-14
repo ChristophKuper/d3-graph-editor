@@ -34,6 +34,8 @@ GraphEditor = function(element, options){
     this._radius        = this._options.radius       || 12;
     this._mouseMode     = this._options.mouseMode    || true;
     this._textMode      = this._options.textMode     || true;
+    this._onAddNode     = this._options.onAddNode    || function(){};
+    this._onAddLink     = this._options.onAddLink    || function(){};
     this._color         = d3.scale.category10();
 
     //container
@@ -219,6 +221,7 @@ GraphEditor.prototype.addNode = function(options){
 
     this._nodes.push(node);
     this.restart();
+    this._onAddNode();
 };
 
 GraphEditor.prototype.addLink = function(options){
@@ -244,6 +247,7 @@ GraphEditor.prototype.addLink = function(options){
     this._selected_link = link;
     this._selected_node = null;
     this.restart();
+    this._onAddLink();
 };
 
 GraphEditor.prototype.mousedown = function(){

@@ -54,8 +54,16 @@
                     {source: newnodes[0], target: newnodes[1], left: false, right: true }
                 ];
 
+                function onAddNode(node){
+                    console.log("A node was added!");
+                }
+
+                function onAddLink(link){
+                    console.log("A link was added!");
+                }
+
                 //testing
-                var editor = new GraphEditor("#graphEditor",  {nodes : nodes, links : links, lastNodeID : 2});
+                var editor = new GraphEditor("#graphEditor",  {nodes : nodes, links : links, lastNodeID : 2, onAddNode : onAddNode, onAddLink : onAddLink});
 
                 //reload test
                 setTimeout(function(){
