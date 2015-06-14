@@ -221,7 +221,7 @@ GraphEditor.prototype.addNode = function(options){
 
     this._nodes.push(node);
     this.restart();
-    this._onAddNode();
+    this._onAddNode(node);
 };
 
 GraphEditor.prototype.addLink = function(options){
@@ -247,7 +247,7 @@ GraphEditor.prototype.addLink = function(options){
     this._selected_link = link;
     this._selected_node = null;
     this.restart();
-    this._onAddLink();
+    this._onAddLink(link);
 };
 
 GraphEditor.prototype.mousedown = function(){
