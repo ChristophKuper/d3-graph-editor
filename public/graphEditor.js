@@ -202,22 +202,6 @@ GraphEditor.prototype.reload = function reload(options){
         .on('tick', this.tick.bind(this));
 
     this.restart();
-
-    /** deprecated and buggy
-    this._nodes.splice(0, this._nodes.length);
-    this._links.splice(0, this._links.length);
-    this.restart();
-
-    this._lastNodeID = options.lastNodeID || 0;
-
-    options.nodes.forEach(function(entry){
-        self.addNode(entry);
-    });
-
-    options.links.forEach(function(entry){
-        //self.addLink(entry);
-    });
-    **/
 };
 
 GraphEditor.prototype.addNode = function(options){
