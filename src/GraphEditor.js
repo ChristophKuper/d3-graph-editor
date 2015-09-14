@@ -1,21 +1,3 @@
-/**
- * This is a D3.js Graph Editor Modul
- * which was extended from http://bl.ocks.org/rkirsling/5001347
- *
- * TODO bounding box
- * TODO gravity
- * TODO reflexive mode
- * TODO zoom
- * TODO kantengewichte
- * TODO visualize graph algorithms
- * TODO custom coloring
- * TODO stop charge on drag
- * TODO add link by id and add node if neccessary
- * TODO add all link properties
- * TODO improve reload
- * TODO id or index mode
- *
-**/
 GraphEditor = function(element, options){
 
     //data
