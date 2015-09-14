@@ -2,7 +2,8 @@
  * This is a D3.js Graph Editor Modul
  * which was extended from http://bl.ocks.org/rkirsling/5001347
  *
- * TODO bounding box and gravity
+ * TODO bounding box
+ * TODO gravity
  * TODO reflexive mode
  * TODO zoom
  * TODO kantengewichte
@@ -47,29 +48,29 @@ GraphEditor = function(element, options){
 
     //end arrow
     this._svg.append('svg:defs').append('svg:marker')
-            .attr('class', 'graphEditor_path')
-            .attr('id', 'end-arrow')
-            .attr('viewBox', '0 -5 10 10')
-            .attr('refX', 6)
-            .attr('markerWidth', 3)
-            .attr('markerHeight', 3)
-            .attr('orient', 'auto')
-        .append('svg:path')
-            .attr('d', 'M0,-5L10,0L0,5')
-            .attr('fill', '#000');
+        .attr('class', 'graphEditor_path')
+        .attr('id', 'end-arrow')
+        .attr('viewBox', '0 -5 10 10')
+        .attr('refX', 6)
+        .attr('markerWidth', 3)
+        .attr('markerHeight', 3)
+        .attr('orient', 'auto')
+    .append('svg:path')
+        .attr('d', 'M0,-5L10,0L0,5')
+        .attr('fill', '#000');
 
     //start arrow
     this._svg.append('svg:defs').append('svg:marker')
-            .attr('class', 'graphEditor_path')
-            .attr('id', 'start-arrow')
-            .attr('viewBox', '0 -5 10 10')
-            .attr('refX', 4)
-            .attr('markerWidth', 3)
-            .attr('markerHeight', 3)
-            .attr('orient', 'auto')
-      .append('svg:path')
-            .attr('d', 'M10,-5L0,0L10,5')
-            .attr('fill', '#000');
+        .attr('class', 'graphEditor_path')
+        .attr('id', 'start-arrow')
+        .attr('viewBox', '0 -5 10 10')
+        .attr('refX', 4)
+        .attr('markerWidth', 3)
+        .attr('markerHeight', 3)
+        .attr('orient', 'auto')
+  .append('svg:path')
+        .attr('d', 'M10,-5L0,0L10,5')
+        .attr('fill', '#000');
 
     //drag line
     this._drag_line = this._svg.append('svg:path')
@@ -113,6 +114,7 @@ GraphEditor = function(element, options){
 GraphEditor.prototype.tick = function(){
     //update path position
     this._path.attr('d', function(d) {
+        
         var deltaX = d.target.x - d.source.x,
             deltaY = d.target.y - d.source.y,
             dist = Math.sqrt(deltaX * deltaX + deltaY * deltaY),

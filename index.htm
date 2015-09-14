@@ -1,0 +1,57 @@
+<html>
+<head>
+    <title>D3.js Graph Editor</title>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/3.5.6/d3.min.js" charset="utf-8"></script>
+    <link href="GraphEditor.css" rel="stylesheet">
+    <script src="GraphEditor.js" type="text/javascript"></script>
+    <script type="text/javascript">
+
+        demo = function(){
+            //inital data
+            var nodes = [
+                {id: 0, reflexive: false, additinalData:"foo"},
+                {id: 1, reflexive: true, additinalData:"bar" },
+                {id: 2, reflexive: false, additinalData:"lorem"}
+            ];
+
+            var links = [
+                {source: nodes[0], target: nodes[1], left: false, right: true },
+                {source: nodes[1], target: nodes[2], left: false, right: true }
+            ];
+
+            function onAddNode(node){
+                console.log("A node was added!");
+                console.log(node);
+            }
+
+            function onAddLink(link){
+                console.log("A link was added!");
+                console.log(link);
+            }
+
+            //testing
+            var editor = new GraphEditor("#graphEditor",  {nodes : nodes, links : links, lastNodeID : 2});
+
+            //reload data
+            var newnodes = [
+                {id: 1, test:"test", reflexive: false},
+                {id: 1, reflexive: true }
+            ];
+
+            var newlinks = [
+                {source: newnodes[0], target: newnodes[1], left: false, right: true }
+            ];
+
+            //reload test
+            setTimeout(function(){
+                //editor.reload({nodes: newnodes, links: newlinks, lastNodeID : 1});
+            }, 5000);
+        }
+    </script>
+</head>
+<body onload=demo()>
+    <h1>D3.js Graph Editor</h1></p>
+    <div id="graphEditor"></div>
+</body>
+</html>
