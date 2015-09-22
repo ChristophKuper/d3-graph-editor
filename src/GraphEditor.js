@@ -1,24 +1,24 @@
 GraphEditor = function(element, options){
 
     //data
-    this._options       = options                    || {};
-    this._nodes         = this._options.nodes        || [];
-    this._links         = this._options.links        || [];
-    this._lastNodeID    = this._options.lastNodeID   || 0;
+    this._options 		= typeof options !== 'undefined' 					? options : {};
+    this._nodes 		= typeof this._options.nodes !== 'undefined' 		? this._options.nodes : [];
+    this._links         = typeof this._options.links !== 'undefined'        ? this._options.links : [];
+    this._lastNodeID    = typeof this._options.lastNodeID !== 'undefined'   ? this._options.lastNodeID : 0;
 
     //settings
-    this._div           = element                    || "";
-    this._width         = this._options.width        || 500;
-    this._height        = this._options.height       || 500;
-    this._charge        = this._options.carge        || -500;
-    this._linkDistance  = this._options.linkDistance || 150;
+    this._div           = typeof element !== 'undefined'                    ? element : "";
+    this._width         = typeof this._options.width !== 'undefined'        ? this._options.width : 500;
+    this._height        = typeof this._options.height !== 'undefined'       ? this._options.height : 500;
+    this._charge        = typeof this._options.carge !== 'undefined'        ? this._options.carge : -500;
+    this._linkDistance  = typeof this._options.linkDistance !== 'undefined' ? this._options.linkDistance : 150;
 
     //config
-    this._radius        = this._options.radius       || 12;
-    this._mouseMode     = this._options.mouseMode    || true;
-    this._textMode      = this._options.textMode     || true;
-    this._onAddNode     = this._options.onAddNode    || function(){};
-    this._onAddLink     = this._options.onAddLink    || function(){};
+    this._radius        = typeof this._options.radius !== 'undefined'       ? this._options.radius : 12;
+    this._mouseMode     = typeof this._options.mouseMode !== 'undefined'    ? this._options.mouseMode : true;
+    this._textMode      = typeof this._options.textMode !== 'undefined'     ? this._options.textMode : true;
+    this._onAddNode     = typeof this._options.onAddNode !== 'undefined'    ? this._options.onAddNode : function(){};
+    this._onAddLink     = typeof this._options.onAddLink !== 'undefined'    ? this._options.onAddLink : function(){};
     this._color         = d3.scale.category10();
 
     //container
