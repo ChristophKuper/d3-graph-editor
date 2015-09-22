@@ -60,7 +60,7 @@ GraphEditor = function(element, options){
 
 	//drag line
 	this._drag_line = this._svg.append('svg:path')
-		.attr('class', 'graphEditor_edge edge dragline hidden')
+		.attr('class', 'graphEditor_edge edge graphEditor_dragline graphEditor_hidden')
 		.attr('d', 'M0,0L0,0');
 
 	//layout
@@ -133,14 +133,14 @@ GraphEditor.prototype.restart = function restart(){
 	this._edgeContainer = this._edgeContainer.data(this._edges);
 
 	//update section (edge)
-	this._edgeContainer.classed('selected', function(d){ return d === self._selected_edge; })
+	this._edgeContainer.classed('graphEditor_selected', function(d){ return d === self._selected_edge; })
 		.style('marker-start', function(d){ return d.left ? 'url(#start-arrow)' : ''; })
 		.style('marker-end', function(d){ return d.right ? 'url(#end-arrow)' : ''; });
 
 	//enter section (edge)
 	this._edgeContainer.enter().append('svg:path')
 		.attr('class', 'graphEditor_edge edge')
-		.classed('selected', function(d){ return d === self._selected_edge; })
+		.classed('graphEditor_selected', function(d){ return d === self._selected_edge; })
 		.style('marker-start', function(d){ return d.left ? 'url(#start-arrow)' : ''; })
 		.style('marker-end', function(d){ return d.right ? 'url(#end-arrow)' : ''; })
 		.on('mousedown', this.mouseEdgeUp.bind(self));
@@ -153,7 +153,7 @@ GraphEditor.prototype.restart = function restart(){
 	//update section (node)
 	this._nodeContainer.selectAll('circle')
 		.style('fill', function(d){ return (d === self._selected_node) ? d3.rgb(self._color(d.id)).brighter().toString() : self._color(d.id); })
-		.classed('reflexive', function(d){ return d.reflexive; });
+		.classed('graphEditor_reflexive', function(d){ return d.reflexive; });
 
 	//enter section (node)
 	var g = this._nodeContainer.enter().append('svg:g');
@@ -163,7 +163,7 @@ GraphEditor.prototype.restart = function restart(){
 		.attr('r', this._radius)
 		.style('fill', function(d){ return (d === self._selected_node) ? d3.rgb(self._color(d.id)).brighter().toString() : self._color(d.id); })
 		.style('stroke', function(d){ return d3.rgb(self._color(d.id)).darker().toString(); })
-		.classed('reflexive', function(d){ return d.reflexive; })
+		.classed('graphEditor_reflexive', function(d){ return d.reflexive; })
 		.on('mousedown', this.mouseNodeDown.bind(self))
 		.on('mouseup', this.mouseNodeUp.bind(self));
 
@@ -211,7 +211,7 @@ GraphEditor.prototype.mouseup = function(){
 	//hide draglinge
 	if(this._mousedown_node){
 		this._drag_line
-			.classed('hidden', true)
+			.classed('graphEditor_hidden', true)
 			.style('marker-end', '');
 	}
 
@@ -237,7 +237,7 @@ GraphEditor.prototype.mouseNodeDown = function(d){
 	//show drag line
 	this._drag_line
 		.style('marker-end', 'url(#end-arrow)')
-		.classed('hidden', false)
+		.classed('graphEditor_hidden', false)
 		.attr('d', 'M' + this._mousedown_node.x + ',' + this._mousedown_node.y + 'L' + this._mousedown_node.x + ',' + this._mousedown_node.y);
 
 	this.restart();
@@ -252,7 +252,7 @@ GraphEditor.prototype.mouseNodeUp = function(d){
 
 	//hide drag line and arrow
 	this._drag_line
-		.classed('hidden', true)
+		.classed('graphEditor_hidden', true)
 		.style('marker-end', '');
 
 	//return if it is still the same node

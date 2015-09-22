@@ -12,45 +12,42 @@
   cursor: crosshair;
 }
 
-.graphEditor_edge.edge {
-  fill: none;
-  stroke: #000;
-  stroke-width: 4px;
-  cursor: default;
-}
-
-.graphEditor_svg:not(.active):not(.ctrl) .graphEditor_edge.edge {
+.graphEditor_svg:not(.graphEditor_ctrl) .graphEditor_edge.edge {
   cursor: pointer;
-}
-
-.graphEditor_edge.edge.selected {
-  stroke-dasharray: 10,2;
-}
-
-.graphEditor_edge.edge.dragline {
-  pointer-events: none;
-}
-
-.graphEditor_edge.edge.hidden {
-  stroke-width: 0;
 }
 
 .graphEditor_node.node {
-  stroke-width: 1.5px;
   cursor: pointer;
+  stroke-width: 1.5px;
 }
 
-.graphEditor_node.node.reflexive {
+.graphEditor_node.graphEditor_reflexive.node {
   stroke: #000 !important;
   stroke-width: 2.5px;
 }
 
-.graphEditor_nodeText {
+.graphEditor_nodeText.graphEditor_nodeID {
   font: 12px sans-serif;
+  font-weight: bold;
+  pointer-events: none;
+  text-anchor: middle;
+}
+
+.graphEditor_edge.edge {
+  cursor: default;
+  fill: none;
+  stroke: #000;
+  stroke-width: 4px;
+}
+
+.graphEditor_edge.graphEditor_dragline.edge {
   pointer-events: none;
 }
 
-.graphEditor_nodeText.graphEditor_nodeID {
-  text-anchor: middle;
-  font-weight: bold;
+.graphEditor_edge.graphEditor_selected.edge {
+  stroke-dasharray: 10,2;
+}
+
+.graphEditor_edge.graphEditor_hidden.edge {
+  stroke-width: 0;
 }
