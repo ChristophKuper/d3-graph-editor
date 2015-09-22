@@ -201,7 +201,6 @@ GraphEditor.prototype.mousemove = function(){
 
 	//draw dragline
 	this._drag_line.attr('d', 'M' + this._mousedown_node.x + ',' + this._mousedown_node.y + 'L' + d3.mouse(this._svg.node())[0] + ',' + d3.mouse(this._svg.node())[1]);
-	this.restart();
 };
 
 /**
@@ -240,6 +239,7 @@ GraphEditor.prototype.mouseNodeDown = function(d){
 		.classed('graphEditor_hidden', false)
 		.attr('d', 'M' + this._mousedown_node.x + ',' + this._mousedown_node.y + 'L' + this._mousedown_node.x + ',' + this._mousedown_node.y);
 
+	//restart to show selected status
 	this.restart();
 };
 
@@ -296,6 +296,7 @@ GraphEditor.prototype.mouseEdgeUp = function(d){
 	}
 	this._selected_node = null;
 
+	//restart to show selected status
 	this.restart();
 };
 
@@ -334,7 +335,6 @@ GraphEditor.prototype.keydown = function(){
 
 			this._selected_edge = null;
 			this._selected_node = null;
-			this.restart();
 			break;
 
 		//B (both)
@@ -343,7 +343,6 @@ GraphEditor.prototype.keydown = function(){
 				this._selected_edge.left = true;
 				this._selected_edge.right = true;
 			}
-			this.restart();
 			break;
 
 		//L (left)
@@ -352,7 +351,6 @@ GraphEditor.prototype.keydown = function(){
 				this._selected_edge.left = true;
 				this._selected_edge.right = false;
 			}
-			this.restart();
 			break;
 
 		//R (right)
@@ -363,9 +361,11 @@ GraphEditor.prototype.keydown = function(){
 				this._selected_edge.left = false;
 				this._selected_edge.right = true;
 			}
-		this.restart();
-		break;
+			break;
 	}
+
+	//restart to show changes
+	this.restart();
 };
 
 /**
@@ -427,6 +427,7 @@ GraphEditor.prototype.reload = function reload(options){
 		.charge(this._charge)
 		.on('tick', this.tick.bind(this));
 
+	//reinitalize
 	this.restart();
 };
 
@@ -446,8 +447,10 @@ GraphEditor.prototype.addNode = function(options){
 		node[prop]=options[prop];
 
 	this._nodes.push(node);
-	this.restart();
 	this._onAddNode(node);
+
+	//restart to show changes
+	this.restart();
 };
 
 /**
@@ -474,6 +477,8 @@ GraphEditor.prototype.addEdge = function(options){
 
 	this._selected_edge = edge;
 	this._selected_node = null;
-	this.restart();
 	this._onAddEdge(edge);
+
+	//restart to show changes
+	this.restart();
 };
