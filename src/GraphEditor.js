@@ -10,8 +10,8 @@ GraphEditor = function(element, options){
 
 	//settings
 	this._div 			= typeof element !== 'undefined'					? element 						: "";
-	this._width 		= typeof this._options.width !== 'undefined'		? this._options.width 			: 500;
-	this._height 		= typeof this._options.height !== 'undefined'		? this._options.height 			: 500;
+	this._width 		= typeof this._options.width !== 'undefined'		? this._options.width 			: "100%";
+	this._height 		= typeof this._options.height !== 'undefined'		? this._options.height 			: "100%";
 	this._charge 		= typeof this._options.carge !== 'undefined'		? this._options.carge 			: -500;
 	this._edgeDistance 	= typeof this._options.edgeDistance !== 'undefined' ? this._options.edgeDistance 	: 150;
 
@@ -27,8 +27,12 @@ GraphEditor = function(element, options){
 	this._svg = d3.select(this._div)
 		.append('svg')
 		.attr('class', 'graphEditor_svg')
-		.attr('width', this._width)
-		.attr('height', this._height);
+		.style('width', '100%')
+		.style('height', '100%');
+
+	//read px width and height
+	this._width = this._svg[0][0].offsetWidth;
+	this._height = this._svg[0][0].offsetHeight;
 
 	//end arrow
 	this._svg.append('svg:defs')
@@ -86,10 +90,10 @@ GraphEditor = function(element, options){
 
 	//listener
 	this._svg.on('mousedown', this.mousedown.bind(this))
-		.on('mousemove', this.mousemove.bind(this))
 		.on('mouseup', this.mouseup.bind(this));
 
 	d3.select(window)
+		.on('mousemove', this.mousemove.bind(this))
 		.on('keydown', this.keydown.bind(this))
 		.on('keyup', this.keyup.bind(this));
 
@@ -284,9 +288,6 @@ GraphEditor.prototype.mouseNodeUp = function(d){
  * fires if the mouse was released on an edge
 **/
 GraphEditor.prototype.mouseEdgeUp = function(d){
-	//if ctrl is pressed return
-	if(d3.event.ctrlKey) return; //not needed
-
 	//select or deselect edge (and also deselect node)
 	this._mousedown_edge = d;
 	if(this._mousedown_edge === this._selected_edge){
@@ -304,10 +305,6 @@ GraphEditor.prototype.mouseEdgeUp = function(d){
  * fires if a key was pressed
 **/
 GraphEditor.prototype.keydown = function(){
-
-	//general
-	d3.event.preventDefault(); //not needed
-
 	//return if a key is pressed
 	if(this._lastKeyDown !== -1) return;
 
