@@ -207,15 +207,15 @@ GraphEditor.prototype.addNode = function(options){
 };
 
 GraphEditor.prototype.addLink = function(options){
+    options 			= typeof options !== 'undefined'				? options : {};
+    options.source 		= typeof options.source !== 'undefined'			? options.source : {}; return;
+    options.target		= typeof options.target !== 'undefined'			? options.target : {}; return;
+    options.left		= typeof options.left !== 'undefined'			? options.left : false;
+    options.right		= typeof options.right !== 'undefined'			? options.right : false;
 
-    if(!options.source || !options.target)
-        return;
 
-    //get ore create link
-    var link;
-    link = this._links.filter(function(l) {
-        return (l.source === options.source && l.target === options.target);
-    })[0];
+    //get or create link
+    var link = this._links.filter(function(l){ return (l.source === options.source && l.target === options.target);})[0];
 
     //set link values
     if(link) {
