@@ -15,7 +15,7 @@
                 {id: 2, reflexive: false, additinalData:"lorem"}
             ];
 
-            var links = [
+            var edges = [
                 {source: nodes[0], target: nodes[1], left: false, right: true },
                 {source: nodes[1], target: nodes[2], left: false, right: true }
             ];
@@ -31,21 +31,21 @@
             }
 
             //testing
-            var editor = new GraphEditor("#graphEditor",  {nodes : nodes, links : links, lastNodeID : 2});
+            var editor = new GraphEditor("#graphEditor",  {nodes : nodes, edges : edges, lastNodeID : 2});
 
             //reload data
-            var newnodes = [
+            var newNodes = [
                 {id: 1, test:"test", reflexive: false},
                 {id: 1, reflexive: true }
             ];
 
-            var newlinks = [
-                {source: newnodes[0], target: newnodes[1], left: false, right: true }
+            var newEdges = [
+                {source: newNodes[0], target: newNodes[1], left: false, right: true }
             ];
 
             //reload test
             setTimeout(function(){
-                //editor.reload({nodes: newnodes, links: newlinks, lastNodeID : 1});
+                //editor.reload({nodes: newNodes, edges: newEdges, lastNodeID : 1});
             }, 5000);
         }
     </script>

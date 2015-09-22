@@ -5,7 +5,7 @@ GraphEditor = function(element, options){
 	//data
 	this._options 		= typeof options !== 'undefined' 					? options 						: {};
 	this._nodes 		= typeof this._options.nodes !== 'undefined' 		? this._options.nodes 			: [];
-	this._links 		= typeof this._options.links !== 'undefined' 		? this._options.links 			: [];
+	this._edges 		= typeof this._options.edges !== 'undefined' 		? this._options.edges 			: [];
 	this._lastNodeID 	= typeof this._options.lastNodeID !== 'undefined' 	? this._options.lastNodeID 		: 0;
 
 	//settings
@@ -13,14 +13,14 @@ GraphEditor = function(element, options){
 	this._width 		= typeof this._options.width !== 'undefined'		? this._options.width 			: 500;
 	this._height 		= typeof this._options.height !== 'undefined'		? this._options.height 			: 500;
 	this._charge 		= typeof this._options.carge !== 'undefined'		? this._options.carge 			: -500;
-	this._linkDistance 	= typeof this._options.linkDistance !== 'undefined' ? this._options.linkDistance 	: 150;
+	this._edgeDistance 	= typeof this._options.edgeDistance !== 'undefined' ? this._options.edgeDistance 	: 150;
 
 	//config
 	this._radius 		= typeof this._options.radius !== 'undefined' 		? this._options.radius 			: 12;
 	this._mouseMode 	= typeof this._options.mouseMode !== 'undefined' 	? this._options.mouseMode 		: true;
 	this._textMode 		= typeof this._options.textMode !== 'undefined' 	? this._options.textMode 		: true;
 	this._onAddNode 	= typeof this._options.onAddNode !== 'undefined' 	? this._options.onAddNode 		: function(){};
-	this._onAddLink 	= typeof this._options.onAddLink !== 'undefined' 	? this._options.onAddLink 		: function(){};
+	this._onAddEdge 	= typeof this._options.onaddEdge !== 'undefined' 	? this._options.onaddEdge 		: function(){};
 	this._color 		= d3.scale.category10();
 
 	//container
@@ -58,15 +58,15 @@ GraphEditor = function(element, options){
 
 	//drag line
 	this._drag_line = this._svg.append('svg:path')
-		.attr('class', 'graphEditor_path link dragline hidden')
+		.attr('class', 'graphEditor_path edge dragline hidden')
 		.attr('d', 'M0,0L0,0');
 
 	//layout
 	this._force = d3.layout.force()
 		.nodes(this._nodes)
-		.links(this._links)
+		.links(this._edges)
 		.size([this._width, this._height])
-		.linkDistance(this._linkDistance)
+		.linkDistance(this._edgeDistance)
 		.charge(this._charge)
 		.on('tick', this.tick.bind(this));
 
@@ -76,8 +76,8 @@ GraphEditor = function(element, options){
 
 	//status saves
 	this._selected_node = null;
-	this._selected_link = null;
-	this._mousedown_link = null;
+	this._selected_edge = null;
+	this._mousedown_edge = null;
 	this._mousedown_node = null;
 	this._mouseup_node = null;
 	this._lastKeyDown = -1;
@@ -128,17 +128,17 @@ GraphEditor.prototype.tick = function(){
 GraphEditor.prototype.restart = function restart(){
 	var self = this;
 
-	this._path = this._path.data(this._links);
+	this._path = this._path.data(this._edges);
 
 	//update section (path)
-	this._path.classed('selected', function(d){ return d === self._selected_link; })
+	this._path.classed('selected', function(d){ return d === self._selected_edge; })
 		.style('marker-start', function(d){ return d.left ? 'url(#start-arrow)' : ''; })
 		.style('marker-end', function(d){ return d.right ? 'url(#end-arrow)' : ''; });
 
 	//enter section (path)
 	this._path.enter().append('svg:path')
-		.attr('class', 'graphEditor_path link')
-		.classed('selected', function(d){ return d === self._selected_link; })
+		.attr('class', 'graphEditor_path edge')
+		.classed('selected', function(d){ return d === self._selected_edge; })
 		.style('marker-start', function(d){ return d.left ? 'url(#start-arrow)' : ''; })
 		.style('marker-end', function(d){ return d.right ? 'url(#end-arrow)' : ''; })
 		.on('mousedown', this.mousePathUp.bind(self));
@@ -182,8 +182,8 @@ GraphEditor.prototype.restart = function restart(){
  * fires if the mouse was clicked on the svg
 **/
 GraphEditor.prototype.mousedown = function(){
-	//return if ctl was pressed / a circle or link is already selected / mouseMode is disabled
-	if(d3.event.ctrlKey || this._mousedown_node || this._mousedown_link || !this._mouseMode) return;
+	//return if ctl was pressed / a circle or edge is already selected / mouseMode is disabled
+	if(d3.event.ctrlKey || this._mousedown_node || this._mousedown_edge || !this._mouseMode) return;
 
 	//add new node
 	var point = d3.mouse(this._svg.node());
@@ -223,14 +223,14 @@ GraphEditor.prototype.mouseCircleDown = function(d){
 	//return if ctrl is pressed
 	if(d3.event.ctrlKey) return;
 
-	//select or deselect node (and deselect link)
+	//select or deselect node (and deselect edge)
 	this._mousedown_node = d;
 	if(this._mousedown_node === this._selected_node){
 		this._selected_node = null;
 	}else{
 		this._selected_node = this._mousedown_node;
 	}
-	this._selected_link = null;
+	this._selected_edge = null;
 
 	//show drag line
 	this._drag_line
@@ -274,8 +274,8 @@ GraphEditor.prototype.mouseCircleUp = function(d){
 		right = false;
 	}
 
-	//add new link
-	this.addLink({source : source, target : target, left : left, right : right});
+	//add new edge
+	this.addEdge({source : source, target : target, left : left, right : right});
 };
 
 /**
@@ -285,12 +285,12 @@ GraphEditor.prototype.mousePathUp = function(d){
 	//if ctrl is pressed return
 	if(d3.event.ctrlKey) return; //not needed
 
-	//select or deselect link (and also deselect node)
-	this._mousedown_link = d;
-	if(this._mousedown_link === this._selected_link){
-		this._selected_link = null;
+	//select or deselect edge (and also deselect node)
+	this._mousedown_edge = d;
+	if(this._mousedown_edge === this._selected_edge){
+		this._selected_edge = null;
 	}else{
-		this._selected_link = this._mousedown_link;
+		this._selected_edge = this._mousedown_edge;
 	}
 	this._selected_node = null;
 
@@ -316,8 +316,8 @@ GraphEditor.prototype.keydown = function(){
 		this._svg.classed('ctrl', true);
 	}
 
-	//if no link or node was selected return
-	if(!this._selected_node && !this._selected_link) return;
+	//if no edge or node was selected return
+	if(!this._selected_node && !this._selected_edge) return;
 
 	switch(d3.event.keyCode){
 		//delete or backspace - delete node
@@ -325,30 +325,30 @@ GraphEditor.prototype.keydown = function(){
 		case 46:
 			if(this._selected_node){
 				this._nodes.splice(this._nodes.indexOf(this._selected_node), 1);
-				this.spliceLinksForNode(this._selected_node);
-			}else if(this._selected_link){
-				this._links.splice(this._links.indexOf(this._selected_link), 1);
+				this.spliceEdgesForNode(this._selected_node);
+			}else if(this._selected_edge){
+				this._edges.splice(this._edges.indexOf(this._selected_edge), 1);
 			}
 
-			this._selected_link = null;
+			this._selected_edge = null;
 			this._selected_node = null;
 			this.restart();
 			break;
 
 		//B (both)
 		case 66:
-			if(this._selected_link){
-				this._selected_link.left = true;
-				this._selected_link.right = true;
+			if(this._selected_edge){
+				this._selected_edge.left = true;
+				this._selected_edge.right = true;
 			}
 			this.restart();
 			break;
 
 		//L (left)
 		case 76:
-			if(this._selected_link){
-				this._selected_link.left = true;
-				this._selected_link.right = false;
+			if(this._selected_edge){
+				this._selected_edge.left = true;
+				this._selected_edge.right = false;
 			}
 			this.restart();
 			break;
@@ -357,9 +357,9 @@ GraphEditor.prototype.keydown = function(){
 		case 82:
 			if(this._selected_node){
 				this._selected_node.reflexive = !this._selected_node.reflexive;
-			}else if(this._selected_link){
-				this._selected_link.left = false;
-				this._selected_link.right = true;
+			}else if(this._selected_edge){
+				this._selected_edge.left = false;
+				this._selected_edge.right = true;
 			}
 		this.restart();
 		break;
@@ -382,19 +382,19 @@ GraphEditor.prototype.keyup = function(){
 };
 
 /**
- * method to splice links for a node
+ * method to splice edge for a node
 **/
-GraphEditor.prototype.spliceLinksForNode = function(node){
+GraphEditor.prototype.spliceEdgesForNode = function(node){
 	var self = this;
 
-	//get all links which are connected
-	var toSplice = this._links.filter(function(l){
+	//get all edges which are connected
+	var toSplice = this._edges.filter(function(l){
 		return (l.source === node || l.target === node);
 	});
 
 	//remove them from list
 	toSplice.map(function(l){
-		self._links.splice(self._links.indexOf(l), 1);
+		self._edges.splice(self._edges.indexOf(l), 1);
 	});
 };
 
@@ -404,7 +404,7 @@ GraphEditor.prototype.spliceLinksForNode = function(node){
 GraphEditor.prototype.resetMouseVars = function(){
 	this._mousedown_node = null;
 	this._mouseup_node = null;
-	this._mousedown_link = null;
+	this._mousedown_edge = null;
 };
 
 /**
@@ -413,15 +413,15 @@ GraphEditor.prototype.resetMouseVars = function(){
 GraphEditor.prototype.reload = function reload(options){
 	options 			= typeof options !== 'undefined'				? options 				: {};
 	this._nodes 		= typeof options.nodes !== 'undefined'			? options.nodes 		: [];
-	this._links 		= typeof options.links !== 'undefined'			? options.links 		: [];
+	this._edges 		= typeof options.edges !== 'undefined'			? options.edges 		: [];
 	this._lastNodeID 	= typeof options.lastNodeID !== 'undefined'		? options.lastNodeID 	: 0;
 
 	this._force.stop();
 	this._force = d3.layout.force()
 		.nodes(this._nodes)
-		.links(this._links)
+		.links(this._edges)
 		.size([this._width, this._height])
-		.linkDistance(this._linkDistance)
+		.linkDistance(this._edgeDistance)
 		.charge(this._charge)
 		.on('tick', this.tick.bind(this));
 
@@ -449,30 +449,29 @@ GraphEditor.prototype.addNode = function(options){
 };
 
 /**
- * method to add a link
+ * method to add a edge
 **/
-GraphEditor.prototype.addLink = function(options){
+GraphEditor.prototype.addEdge = function(options){
 	options 			= typeof options !== 'undefined'				? options 			: {};
-	options.source 		= typeof options.source !== 'undefined'			? options.source 	: {}; return;
-	options.target		= typeof options.target !== 'undefined'			? options.target 	: {}; return;
+	options.source 		= typeof options.source !== 'undefined'			? options.source 	: {};
+	options.target		= typeof options.target !== 'undefined'			? options.target 	: {};
 	options.left		= typeof options.left !== 'undefined'			? options.left 		: false;
 	options.right		= typeof options.right !== 'undefined'			? options.right		: false;
 
+	//get or create edge
+	var edge = this._edges.filter(function(l){ return (l.source === options.source && l.target === options.target);})[0];
 
-	//get or create link
-	var link = this._links.filter(function(l){ return (l.source === options.source && l.target === options.target);})[0];
-
-	//set link values
-	if(link){
-		link.left = options.left || link.left;
-		link.right = options.right || link.right;
+	//set edge values
+	if(edge){
+		edge.left = options.left || edge.left;
+		edge.right = options.right || edge.right;
 	}else{
-		link = {source: options.source, target: options.target, left: options.left, right: options.right};
-		this._links.push(link);
+		edge = {source: options.source, target: options.target, left: options.left, right: options.right};
+		this._edges.push(edge);
 	}
 
-	this._selected_link = link;
+	this._selected_edge = edge;
 	this._selected_node = null;
 	this.restart();
-	this._onAddLink(link);
+	this._onAddEdge(edge);
 };
