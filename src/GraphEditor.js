@@ -172,13 +172,12 @@ GraphEditor.prototype.restart = function restart(){
 };
 
 GraphEditor.prototype.reload = function reload(options){
-    var self = this;
+    options 			= typeof options !== 'undefined'				? options : {};
+    this._nodes 		= typeof options.nodes !== 'undefined'			? options.nodes : [];
+    this._links         = typeof options.links !== 'undefined'			? options.links : [];
+    this._lastNodeID    = typeof options.lastNodeID !== 'undefined'		? options.lastNodeID : 0;
 
     this._force.stop();
-    this._nodes = options.nodes;
-    this._links = options.links;
-    this._lastNodeID = options.lastNodeID || 0;
-
     this._force = d3.layout.force()
         .nodes(this._nodes)
         .links(this._links)
@@ -191,17 +190,16 @@ GraphEditor.prototype.reload = function reload(options){
 };
 
 GraphEditor.prototype.addNode = function(options){
-    //create node
-    options = options || {};
-    var node        = {};
+    options 			= typeof options !== 'undefined'				? options : {};
+    options.id 			= typeof options.id !== 'undefined'				? options.id : ++this._lastNodeID;
+    options.x 			= typeof options.x !== 'undefined'				? options.x : this._with/2 + Math.random();
+    options.y 			= typeof options.y !== 'undefined'				? options.y : this._height/2 + Math.random();
+    options.reflexive	= typeof options.reflexive !== 'undefined'		? options.reflexive : false;
+
+    var node = { id : options.id, reflexive : options.reflexive, x : options.x, y : options.y};
 
     for(var prop in options)
         node[prop]=options[prop];
-
-    node.id         = !isNaN(options.id)  ?  options.id : ++this._lastNodeID;
-    node.reflexive  = options.reflexive   || false;
-    node.x          = options.x           || this._with/2 + Math.random();
-    node.y          = options.y           || this._height/2 + Math.random();
 
     this._nodes.push(node);
     this.restart();
