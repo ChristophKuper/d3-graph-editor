@@ -60,7 +60,7 @@ GraphEditor = function(element, options){
 
 	//drag line
 	this._drag_line = this._svg.append('svg:path')
-		.attr('class', 'graphEditor_edge edge graphEditor_dragline graphEditor_hidden')
+		.attr('class', 'graphEditor_edge graphEditor_dragline graphEditor_hidden')
 		.attr('d', 'M0,0L0,0');
 
 	//layout
@@ -139,7 +139,7 @@ GraphEditor.prototype.restart = function restart(){
 
 	//enter section (edge)
 	this._edgeContainer.enter().append('svg:path')
-		.attr('class', 'graphEditor_edge edge')
+		.attr('class', 'graphEditor_edge')
 		.classed('graphEditor_selected', function(d){ return d === self._selected_edge; })
 		.style('marker-start', function(d){ return d.left ? 'url(#start-arrow)' : ''; })
 		.style('marker-end', function(d){ return d.right ? 'url(#end-arrow)' : ''; })
@@ -159,7 +159,7 @@ GraphEditor.prototype.restart = function restart(){
 	var g = this._nodeContainer.enter().append('svg:g');
 
 	g.append('svg:circle')
-		.attr('class', 'graphEditor_node node')
+		.attr('class', 'graphEditor_node')
 		.attr('r', this._radius)
 		.style('fill', function(d){ return (d === self._selected_node) ? d3.rgb(self._color(d.id)).brighter().toString() : self._color(d.id); })
 		.style('stroke', function(d){ return d3.rgb(self._color(d.id)).darker().toString(); })
