@@ -12,26 +12,26 @@
   cursor: crosshair;
 }
 
-.graphEditor_path.edge {
+.graphEditor_edge.edge {
   fill: none;
   stroke: #000;
   stroke-width: 4px;
   cursor: default;
 }
 
-.graphEditor_svg:not(.active):not(.ctrl) .graphEditor_path.edge {
+.graphEditor_svg:not(.active):not(.ctrl) .graphEditor_edge.edge {
   cursor: pointer;
 }
 
-.graphEditor_path.edge.selected {
+.graphEditor_edge.edge.selected {
   stroke-dasharray: 10,2;
 }
 
-.graphEditor_path.edge.dragline {
+.graphEditor_edge.edge.dragline {
   pointer-events: none;
 }
 
-.graphEditor_path.edge.hidden {
+.graphEditor_edge.edge.hidden {
   stroke-width: 0;
 }
 
