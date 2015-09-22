@@ -8,7 +8,7 @@
   user-select: none;
 }
 
-.graphEditor_svg:not(.active):not(.ctrl) {
+.graphEditor_svg:not(.graphEditor_ctrl) {
   cursor: crosshair;
 }
 
@@ -35,22 +35,22 @@
   stroke-width: 0;
 }
 
-.graphEditor_circle.node {
+.graphEditor_node.node {
   stroke-width: 1.5px;
   cursor: pointer;
 }
 
-.graphEditor_circle.node.reflexive {
+.graphEditor_node.node.reflexive {
   stroke: #000 !important;
   stroke-width: 2.5px;
 }
 
-.graphEditor_circleText {
+.graphEditor_nodeText {
   font: 12px sans-serif;
   pointer-events: none;
 }
 
-.graphEditor_circleText.graphEditor_circleID {
+.graphEditor_nodeText.graphEditor_nodeID {
   text-anchor: middle;
   font-weight: bold;
 }

@@ -159,7 +159,7 @@ GraphEditor.prototype.restart = function restart(){
 	var g = this._nodeContainer.enter().append('svg:g');
 
 	g.append('svg:circle')
-		.attr('class', 'graphEditor_circle node')
+		.attr('class', 'graphEditor_node node')
 		.attr('r', this._radius)
 		.style('fill', function(d){ return (d === self._selected_node) ? d3.rgb(self._color(d.id)).brighter().toString() : self._color(d.id); })
 		.style('stroke', function(d){ return d3.rgb(self._color(d.id)).darker().toString(); })
@@ -168,7 +168,7 @@ GraphEditor.prototype.restart = function restart(){
 		.on('mouseup', this.mouseNodeUp.bind(self));
 
 	g.append('svg:text')
-		.attr('class', 'graphEditor_circleText graphEditor_circleID')
+		.attr('class', 'graphEditor_nodeText graphEditor_nodeID')
 		.attr('x', 0)
 		.attr('y', 4)
 		.text(function(d){ return self._textMode ? d.id : ""; });
@@ -315,7 +315,7 @@ GraphEditor.prototype.keydown = function(){
 	//
 	if(d3.event.keyCode === 17){
 		this._nodeContainer.call(this._force.drag);
-		this._svg.classed('ctrl', true);
+		this._svg.classed('graphEditor_ctrl', true);
 	}
 
 	//if no edge or node was selected return
@@ -379,7 +379,7 @@ GraphEditor.prototype.keyup = function(){
 		this._nodeContainer
 		.on('mousedown.drag', null)
 		.on('touchstart.drag', null);
-		this._svg.classed('ctrl', false);
+		this._svg.classed('graphEditor_ctrl', false);
 	}
 };
 
