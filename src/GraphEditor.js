@@ -20,7 +20,7 @@ GraphEditor = function(element, options){
 	this._mouseMode 	= typeof this._options.mouseMode !== 'undefined' 	? this._options.mouseMode 		: true;
 	this._textMode 		= typeof this._options.textMode !== 'undefined' 	? this._options.textMode 		: true;
 	this._onAddNode 	= typeof this._options.onAddNode !== 'undefined' 	? this._options.onAddNode 		: function(){};
-	this._onAddEdge 	= typeof this._options.onaddEdge !== 'undefined' 	? this._options.onaddEdge 		: function(){};
+	this._onAddEdge 	= typeof this._options.onAddEdge !== 'undefined' 	? this._options.onAddEdge 		: function(){};
 	this._color 		= d3.scale.category10();
 
 	//container
