@@ -275,8 +275,6 @@ GraphEditor.prototype.mouseNodeUp = function(d){
 
 	//add new edge
 	this.addEdge({source : source, target : target, left : left, right : right});
-
-	console.log(this._edges)
 };
 
 /**
