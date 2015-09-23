@@ -268,20 +268,15 @@ GraphEditor.prototype.mouseNodeUp = function(d){
 
 	//define source and target node
 	var source, target, left, right;
-	if(this._mousedown_node.id < this._mouseup_node.id){
-		source = this._mousedown_node;
-		target = this._mouseup_node;
-		left = false;
-		right = true;
-	}else{
-		source = this._mouseup_node;
-		target = this._mousedown_node;
-		left = true;
-		right = false;
-	}
+	source = this._mousedown_node;
+	target = this._mouseup_node;
+	left = false;
+	right = true;
 
 	//add new edge
 	this.addEdge({source : source, target : target, left : left, right : right});
+
+	console.log(this._edges)
 };
 
 /**
@@ -461,14 +456,19 @@ GraphEditor.prototype.addEdge = function(options){
 	options.right		= typeof options.right !== 'undefined'			? options.right		: false;
 
 	//get or create edge
-	var edge = this._edges.filter(function(l){ return (l.source === options.source && l.target === options.target);})[0];
+	var edge;
+	var edge1 = this._edges.filter(function(l){ return (l.source === options.source && l.target === options.target);})[0];
+	var edge2 = this._edges.filter(function(l){ return (l.source === options.target && l.target === options.source);})[0];
 
 	//set edge values
-	if(edge){
-		edge.left = options.left || edge.left;
-		edge.right = options.right || edge.right;
+	if(edge1){
+		edge1.right = true;
+		edge = edge1;
+	}else if(edge2){
+		edge2.left = true;
+		edge = edge2;
 	}else{
-		edge = {source: options.source, target: options.target, left: options.left, right: options.right};
+		var edge = {source: options.source, target: options.target, left: options.left, right: options.right};
 		this._edges.push(edge);
 	}
 
