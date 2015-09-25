@@ -464,6 +464,9 @@ GraphEditor.prototype.addEdge = function(options){
 		edge = edge1;
 	}else if(edge2){
 		edge2.left = true;
+		var temp = edge2.source;
+		edge2.source = edge2.target;
+		edge2.target = temp;
 		edge = edge2;
 	}else{
 		var edge = {source: options.source, target: options.target, left: options.left, right: options.right};
