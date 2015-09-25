@@ -26,7 +26,7 @@
 - center graph after width or height changes
 - make lastnodeid completly implicit
 - addEdge and also addNode implicit(with parameters) and depends on linkMode
-- store reflexive edges as an extra edge
+- reflexive edges (only call onAddEdge but do not store a link)
 - check if a node (source or target) exist
 - rename source target to node1 node2
 - editable edge weighting & other link properties

@@ -32,13 +32,31 @@
                 console.log(node);
             }
 
+            function onRemoveNode(node){
+                console.log("A node was removed!");
+                console.log(node);
+            }
+
             function onAddEdge(edge){
                 console.log("An edge was added!");
-                console.log(ledge);
+                console.log(edge);
+            }
+
+            function onRemoveEdge(edge){
+                console.log("An edge was removes!");
+                console.log(edge);
             }
 
             //testing
-            var editor = new GraphEditor("#graphEditor",  {nodes : nodes, edges : edges, lastNodeID : 2});
+            var editor = new GraphEditor("#graphEditor", {
+                nodes : nodes,
+                edges : edges,
+                lastNodeID : 2,
+                onAddNode : onAddNode,
+                onRemoveNode : onRemoveNode,
+                onAddEdge : onAddEdge,
+                onRemoveEdge : onRemoveEdge
+            });
 
             //reload data
             var newNodes = [

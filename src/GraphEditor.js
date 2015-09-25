@@ -20,7 +20,9 @@ GraphEditor = function(element, options){
 	this._mouseMode 	= typeof this._options.mouseMode !== 'undefined' 	? this._options.mouseMode 		: true;
 	this._textMode 		= typeof this._options.textMode !== 'undefined' 	? this._options.textMode 		: true;
 	this._onAddNode 	= typeof this._options.onAddNode !== 'undefined' 	? this._options.onAddNode 		: function(){};
+	this._onRemoveNode 	= typeof this._options.onRemoveNode !== 'undefined'	? this._options.onRemoveNode	: function(){};
 	this._onAddEdge 	= typeof this._options.onAddEdge !== 'undefined' 	? this._options.onAddEdge 		: function(){};
+	this._onRemoveEdge 	= typeof this._options.onResmoveEdge !== 'undefined' ? this._options.onRemoveEdge	: function(){};
 	this._color 		= d3.scale.category10();
 
 	//container
@@ -319,8 +321,11 @@ GraphEditor.prototype.keydown = function(){
 			if(this._selected_node){
 				this._nodes.splice(this._nodes.indexOf(this._selected_node), 1);
 				this.spliceEdgesForNode(this._selected_node);
-			}else if(this._selected_edge){
+				this._onRemoveNode(this._selected_node);
+			}
+			if(this._selected_edge){
 				this._edges.splice(this._edges.indexOf(this._selected_edge), 1);
+				this._onRemoveEdge(this._selected_edge);
 			}
 
 			this._selected_edge = null;
@@ -329,27 +334,21 @@ GraphEditor.prototype.keydown = function(){
 
 		//B (both)
 		case 66:
-			if(this._selected_edge){
-				this._selected_edge.left = true;
-				this._selected_edge.right = true;
-			}
+			this.addEdge({source : this._selected_edge.source, target : this._selected_edge.target, left : true, right : true});
 			break;
 
 		//L (left)
 		case 76:
-			if(this._selected_edge){
-				this._selected_edge.left = true;
-				this._selected_edge.right = false;
-			}
+			this.addEdge({source : this._selected_edge.source, target : this._selected_edge.target, left : true, right : false});
 			break;
 
 		//R (right)
 		case 82:
 			if(this._selected_node){
 				this._selected_node.reflexive = !this._selected_node.reflexive;
-			}else if(this._selected_edge){
-				this._selected_edge.left = false;
-				this._selected_edge.right = true;
+			}
+			if(this._selected_edge){
+				this.addEdge({source : this._selected_edge.source, target : this._selected_edge.target, left : false, right : true});
 			}
 			break;
 	}
@@ -460,7 +459,8 @@ GraphEditor.prototype.addEdge = function(options){
 
 	//set edge values
 	if(edge1){
-		edge1.right = true;
+		edge1.right = options.right;
+		edge1.left = options.left;
 		edge = edge1;
 	}else if(edge2){
 		edge2.left = true;
