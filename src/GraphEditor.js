@@ -22,7 +22,7 @@ GraphEditor = function(element, options){
 	this._onAddNode 	= typeof this._options.onAddNode !== 'undefined' 	? this._options.onAddNode 		: function(){};
 	this._onRemoveNode 	= typeof this._options.onRemoveNode !== 'undefined'	? this._options.onRemoveNode	: function(){};
 	this._onAddEdge 	= typeof this._options.onAddEdge !== 'undefined' 	? this._options.onAddEdge 		: function(){};
-	this._onRemoveEdge 	= typeof this._options.onResmoveEdge !== 'undefined' ? this._options.onRemoveEdge	: function(){};
+	this._onRemoveEdge 	= typeof this._options.onRemoveEdge !== 'undefined' ? this._options.onRemoveEdge	: function(){};
 	this._color 		= d3.scale.category10();
 
 	//container
