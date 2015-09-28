@@ -15,13 +15,14 @@
 #ToDo
 - priority#1
 	- catch listener errors
-	- improve demo and make sample application more powerfull
+	- improve demo and make sample application more powerfull (random graph changing)
 	- rename source/target to node1/node2
 	- make edge existence-check implicit
 	- make lastnodeid completly implicit
 	- center graph after width or height changes
 	- reflexive edges listener (only call onAddEdge/onRemoveEdge but do not store a link)
 	- addEdge and also addNode implicit(with parameters) which might depend on linkMode
+	- distinguish between public and private methods
 - priority#2
 	- editable edge weighting & other link properties
 	- refactor link datastructure
@@ -30,6 +31,7 @@
 	- gravity
 	- zoom
 	- multigraph
+	- multiple select (drag & delete)
 	- visualize graph algorithms
 	- custom coloring
 	- stop charge and drag

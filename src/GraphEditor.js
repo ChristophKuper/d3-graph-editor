@@ -318,18 +318,23 @@ GraphEditor.prototype.keydown = function(){
 		//delete or backspace - delete node
 		case 8:
 		case 46:
-			if(this._selected_node){
-				this._nodes.splice(this._nodes.indexOf(this._selected_node), 1);
-				this.spliceEdgesForNode(this._selected_node);
-				this._onRemoveNode(this._selected_node);
-			}
-			if(this._selected_edge){
-				this._edges.splice(this._edges.indexOf(this._selected_edge), 1);
-				this._onRemoveEdge(this._selected_edge);
+			try{
+				if(this._selected_node){
+					this._nodes.splice(this._nodes.indexOf(this._selected_node), 1);
+					this.spliceEdgesForNode(this._selected_node);
+					this._onRemoveNode(this._selected_node);
+				}
+				if(this._selected_edge){
+					this._edges.splice(this._edges.indexOf(this._selected_edge), 1);
+					this._onRemoveEdge(this._selected_edge);
+				}
+
+				this._selected_edge = null;
+				this._selected_node = null;
+			}finally{
+				this.restart();
 			}
 
-			this._selected_edge = null;
-			this._selected_node = null;
 			break;
 
 		//B (both)
@@ -443,10 +448,13 @@ GraphEditor.prototype.addNode = function(options){
 		node[prop]=options[prop];
 
 	this._nodes.push(node);
-	this._onAddNode(node);
 
-	//restart to show changes
-	this.restart();
+	try{
+		this._onAddNode(node)
+	}finally{
+		//restart to show changes
+		this.restart();
+	};
 };
 
 /**
@@ -482,8 +490,11 @@ GraphEditor.prototype.addEdge = function(options){
 
 	this._selected_edge = edge;
 	this._selected_node = null;
-	this._onAddEdge(edge);
 
-	//restart to show changes
-	this.restart();
+	try{
+		this._onAddEdge(edge);
+	}finally{
+		//restart to show changes
+		this.restart();
+	};
 };
