@@ -342,7 +342,7 @@ GraphEditor.prototype.keydown = function(){
 		case 76:
 			if(this._selected_edge.right)
 				this._onRemoveEdge(this._selected_edge);
-			if(!this._selected_edge.left)
+			if(!this._selected_edge.left || this._selected_edge.right)
 				this.addEdge({source : this._selected_edge.source, target : this._selected_edge.target, left : true, right : false});
 			break;
 
@@ -354,7 +354,7 @@ GraphEditor.prototype.keydown = function(){
 			if(this._selected_edge){
 				if(this._selected_edge.left)
 					this._onRemoveEdge(this._selected_edge);
-				if(!this._selected_edge.right)
+				if(this._selected_edge.left || !this._selected_edge.right)
 					this.addEdge({source : this._selected_edge.source, target : this._selected_edge.target, left : false, right : true});
 			}
 			break;
