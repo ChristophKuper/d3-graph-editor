@@ -334,12 +334,16 @@ GraphEditor.prototype.keydown = function(){
 
 		//B (both)
 		case 66:
-			this.addEdge({source : this._selected_edge.source, target : this._selected_edge.target, left : true, right : true});
+			if(!this._selected_edge.left ||!this._selected_edge.right)
+				this.addEdge({source : this._selected_edge.source, target : this._selected_edge.target, left : true, right : true});
 			break;
 
 		//L (left)
 		case 76:
-			this.addEdge({source : this._selected_edge.source, target : this._selected_edge.target, left : true, right : false});
+			if(this._selected_edge.right)
+				this._onRemoveEdge(this._selected_edge);
+			if(!this._selected_edge.left)
+				this.addEdge({source : this._selected_edge.source, target : this._selected_edge.target, left : true, right : false});
 			break;
 
 		//R (right)
@@ -348,7 +352,10 @@ GraphEditor.prototype.keydown = function(){
 				this._selected_node.reflexive = !this._selected_node.reflexive;
 			}
 			if(this._selected_edge){
-				this.addEdge({source : this._selected_edge.source, target : this._selected_edge.target, left : false, right : true});
+				if(this._selected_edge.left)
+					this._onRemoveEdge(this._selected_edge);
+				if(!this._selected_edge.right)
+					this.addEdge({source : this._selected_edge.source, target : this._selected_edge.target, left : false, right : true});
 			}
 			break;
 	}
