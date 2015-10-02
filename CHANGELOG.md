@@ -31,7 +31,7 @@
 	- gravity
 	- zoom
 	- multigraph
-	- multiple select (drag & delete)
+	- multiple select (drag & delete rectangle and shortcut)
 	- visualize graph algorithms
 	- custom coloring
 	- stop charge and drag
