@@ -310,52 +310,48 @@ GraphEditor.prototype.keydown = function(){
     if(self._lastKeyDown !== -1) return;
     self._lastKeyDown = d3.event.keyCode;
 
-    if(d3.event.keyCode === self._){
+    //ctrl
+    if(self._lastKeyDown === self._ctrlKey){
         self._nodeContainer.call(self._force.drag);
         self._svg.classed('graphEditor_ctrl', true);
     }
 
-    if(!self._selected_node && !self._selected_edge) return;
+    //deltet
+    if(self._lastKeyDown === self._deleteKey){
+        if(self._selected_node)
+           self.removeNode(self._selected_node);
+        if(self._selected_edge)
+            self.removeEdge(self._selected_edge)
+    }
 
-    switch(d3.event.keyCode){
+    //reflexive
+    if(self._lastKeyDown === self._reflexsivKey){
+        if(self._selected_node)
+            self._selected_node.reflexive = !self._selected_node.reflexive;
+    }
 
-        case self._deleteKey:
-            if(self._selected_node)
-                self.removeNode(self._selected_node);
-            if(self._selected_edge)
-                self.removeEdge(self._selected_edge)
+    //both
+    if(self._lastKeyDown === self._bothKey){
+        if(!self._selected_edge.left || !self._selected_edge.right)
+            self.addEdge({source : self._selected_edge.source, target : self._selected_edge.target, left : true, right : true});
+    }
 
-            break;
+    //left
+    if(self._lastKeyDown === self._leftKey){
+        if(self._selected_edge.right)
+            self.removeEdge(self._selected_edge, true);
 
-        case self._bothKey:
-            if(!self._selected_edge.left ||!self._selected_edge.right)
-                self.addEdge({source : self._selected_edge.source, target : self._selected_edge.target, left : true, right : true});
+        if(!self._selected_edge.left || self._selected_edge.right)
+            self.addEdge({source : self._selected_edge.source, target : self._selected_edge.target, left : true, right : false});
+    }
 
-            break;
+    //right
+    if(self._lastKeyDown === self._rightKey){
+        if(self._selected_edge.left)
+            self.removeEdge(self._selected_edge, true);
 
-        case self._leftKey:
-            if(self._selected_edge.right)
-                self.removeEdge(self._selected_edge, true);
-
-            if(!self._selected_edge.left || self._selected_edge.right)
-                self.addEdge({source : self._selected_edge.source, target : self._selected_edge.target, left : true, right : false});
-
-            break;
-
-        case self._rightKey:
-            if(self._selected_edge.left)
-                self.removeEdge(self._selected_edge, true);
-
-            if(self._selected_edge.left || !self._selected_edge.right)
-                self.addEdge({source : self._selected_edge.source, target : self._selected_edge.target, left : false, right : true});
-
-            break;
-
-        case self._reflexsivKey:
-            if(self._selected_node)
-                self._selected_node.reflexive = !self._selected_node.reflexive;
-
-            break;
+        if(self._selected_edge.left || !self._selected_edge.right)
+            self.addEdge({source : self._selected_edge.source, target : self._selected_edge.target, left : false, right : true});
     }
 
     self.restart();
