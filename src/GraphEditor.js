@@ -15,6 +15,7 @@ GraphEditor = function(element, options){
 	this._charge 		= typeof this._options.carge !== 'undefined'		? this._options.carge 			: -500;
 	this._edgeDistance 	= typeof this._options.edgeDistance !== 'undefined' ? this._options.edgeDistance 	: 150;
 	this._radius 		= typeof this._options.radius !== 'undefined' 		? this._options.radius 			: 12;
+	this._ctrlKey	 	= typeof this._options.ctrlKey !== 'undefined' 		? this._options.ctrlKey 		: 17;
 	this._deleteKey 	= typeof this._options.deleteKey !== 'undefined' 	? this._options.deleteKey 		: 46;
 	this._leftKey 		= typeof this._options.leftKey !== 'undefined' 		? this._options.leftKey 		: 37;
 	this._rightKey 		= typeof this._options.rightKey !== 'undefined' 	? this._options.rightKey 		: 39;
@@ -303,67 +304,62 @@ GraphEditor.prototype.mouseEdgeUp = function(d){
  * fires if a key was pressed
 **/
 GraphEditor.prototype.keydown = function(){
-	//return if a key is pressed
-	if(this._lastKeyDown !== -1) return;
 
-	this._lastKeyDown = d3.event.keyCode;
+	var self = this;
 
-	//
-	if(d3.event.keyCode === 17){
-		this._nodeContainer.call(this._force.drag);
-		this._svg.classed('graphEditor_ctrl', true);
+	if(self._lastKeyDown !== -1) return;
+	self._lastKeyDown = d3.event.keyCode;
+
+	if(d3.event.keyCode === self._){
+		self._nodeContainer.call(self._force.drag);
+		self._svg.classed('graphEditor_ctrl', true);
 	}
 
-	//if no edge or node was selected return
-	if(!this._selected_node && !this._selected_edge) return;
+	if(!self._selected_node && !self._selected_edge) return;
 
+	switch(d3.event.keyCode){
+		
+		case self._deleteKey:
+			if(self._selected_node)
+				self.removeNode(self._selected_node);
 
-	try{
-		switch(d3.event.keyCode){
-			case this._deleteKey:
-				if(this._selected_node){
-					this.removeNode(this._selected_node);
-				}
-				if(this._selected_edge){
-					this._edges.splice(this._edges.indexOf(this._selected_edge), 1);
-					this._onRemoveEdge(this._selected_edge);
-				}
+			if(self._selected_edge)
+				self.removeEdge(self._selected_edge)
+			
+			break;
+		
+		case self._bothKey:
+			if(!self._selected_edge.left ||!self._selected_edge.right)
+				self.addEdge({source : self._selected_edge.source, target : self._selected_edge.target, left : true, right : true});
+			
+			break;
 
-				this._selected_edge = null;
-				this._selected_node = null;
-				break;
+		case self._leftKey:
+			if(self._selected_edge.right)
+				self.removeEdge(self._selected_edge, true);
 
-			case this._leftKey:
-				if(this._selected_edge.right)
-					this._onRemoveEdge(this._selected_edge);
-				if(!this._selected_edge.left || this._selected_edge.right)
-					this.addEdge({source : this._selected_edge.source, target : this._selected_edge.target, left : true, right : false});
-				break;
+			if(!self._selected_edge.left || self._selected_edge.right)
+				self.addEdge({source : self._selected_edge.source, target : self._selected_edge.target, left : true, right : false});
+			
+			break;
 
-			case this._rightKey:
-				if(this._selected_edge){
-					if(this._selected_edge.left)
-						this._onRemoveEdge(this._selected_edge);
-					if(this._selected_edge.left || !this._selected_edge.right)
-						this.addEdge({source : this._selected_edge.source, target : this._selected_edge.target, left : false, right : true});
-				}
-				break;
-
-			case this._bothKey:
-				if(!this._selected_edge.left ||!this._selected_edge.right)
-					this.addEdge({source : this._selected_edge.source, target : this._selected_edge.target, left : true, right : true});
-				break;
-
-			case this._reflexsivKey:
-				if(this._selected_node){
-					this._selected_node.reflexive = !this._selected_node.reflexive;
-				}
-				break;
-		}
-
-	}finally{
-		this.restart();
+		case self._rightKey:
+			if(self._selected_edge.left) 
+				self.removeEdge(self._selected_edge, true);
+				
+			if(self._selected_edge.left || !self._selected_edge.right)
+				self.addEdge({source : self._selected_edge.source, target : self._selected_edge.target, left : false, right : true});
+			
+			break;
+		
+		case self._reflexsivKey:
+			if(self._selected_node)
+				self._selected_node.reflexive = !self._selected_node.reflexive;
+			
+			break;
 	}
+
+	self.restart();
 };
 
 /**
@@ -449,25 +445,25 @@ GraphEditor.prototype.addNode = function(options){
 	try{
 		this._onAddNode(node)
 	}finally{
-		//restart to show changes
 		this.restart();
 	};
 };
 
-
 /**
- * method to delete a node
+ * method to remove a node
 **/
 GraphEditor.prototype.removeNode = function(node){
-	node = typeof node !== 'undefined' ? node : {};
+	var self = this
+
+	self._nodes.splice(self._nodes.indexOf(node), 1);
+	self.spliceEdgesForNode(node);
+	self._selected_node = null;
 
 	try{
-		this._nodes.splice(this._nodes.indexOf(node), 1);
-		this.spliceEdgesForNode(node);
-		this._onRemoveNode(node)
+		self._onRemoveNode(node)
 	}finally{
-		this.restart();
-	};
+		self.restart();
+	}
 }
 
 /**
@@ -507,7 +503,26 @@ GraphEditor.prototype.addEdge = function(options){
 	try{
 		this._onAddEdge(edge);
 	}finally{
-		//restart to show changes
 		this.restart();
 	};
 };
+
+/**
+ * method to remove an edge
+ * if soft equals true only the listener will be called
+**/
+GraphEditor.prototype.removeEdge = function(edge, soft){
+	var self = this;
+
+	if(!soft){
+		self._edges.splice(self._edges.indexOf(edge), 1);
+		self._selected_edge = null;
+	}
+
+	try{
+		self._onRemoveEdge(edge);
+	}finally{
+		self.restart();
+		return;
+	}
+}

@@ -9,7 +9,7 @@
         #graphEditor{
             border: 1px solid black;
             width: 100%;
-            height: 100%;
+            height: 50%
         }
     </style>
     <script type="text/javascript">
@@ -77,9 +77,8 @@
                 {source: newNodes[0], target: newNodes[1], left: false, right: true }
             ];
 
-            //reload test
             setTimeout(function(){
-                editor.reload({nodes: newNodes, edges: newEdges, lastNodeID : 1});
+                //editor.reload({nodes: newNodes, edges: newEdges, lastNodeID : 1});
             }, 5000);
         }
     </script>
