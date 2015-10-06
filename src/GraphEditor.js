@@ -320,9 +320,7 @@ GraphEditor.prototype.keydown = function(){
 		case 46:
 			try{
 				if(this._selected_node){
-					this._nodes.splice(this._nodes.indexOf(this._selected_node), 1);
-					this.spliceEdgesForNode(this._selected_node);
-					this._onRemoveNode(this._selected_node);
+					self.removeNode(this._selected_node);
 				}
 				if(this._selected_edge){
 					this._edges.splice(this._edges.indexOf(this._selected_edge), 1);
@@ -456,6 +454,22 @@ GraphEditor.prototype.addNode = function(options){
 		this.restart();
 	};
 };
+
+
+/**
+ * method to delete a node
+**/
+GraphEditor.prototype.removeNode = function(node){
+	node = typeof node !== 'undefined' ? node : {};
+
+	try{
+		this._nodes.splice(this._nodes.indexOf(node), 1);
+		this.spliceEdgesForNode(node);
+		this._onRemoveNode(node)
+	}finally{
+		this.restart();
+	};
+}
 
 /**
  * method to add a edge

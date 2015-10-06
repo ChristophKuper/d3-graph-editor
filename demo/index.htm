@@ -15,17 +15,10 @@
     <script type="text/javascript">
 
         demo = function(){
-            //inital data
-            var nodes = [
-                {id: 0, reflexive: false, additinalData:"foo"},
-                {id: 1, reflexive: true, additinalData:"bar" },
-                {id: 2, reflexive: false, additinalData:"lorem"}
-            ];
 
-            var edges = [
-                {source: nodes[0], target: nodes[1], left: false, right: true },
-                {source: nodes[1], target: nodes[2], left: false, right: true }
-            ];
+            d3.selectAll("#remove").on("click", function(){
+                editor.removeNode(nodes[0]);  
+            })
 
             function onAddNode(node){
                 var a = undefinedvariable;
@@ -51,6 +44,18 @@
                 console.log(edge);
             }
 
+            //inital data
+            var nodes = [
+                {id: 0, reflexive: false, additinalData:"foo"},
+                {id: 1, reflexive: true, additinalData:"bar" },
+                {id: 2, reflexive: false, additinalData:"lorem"}
+            ];
+
+            var edges = [
+                {source: nodes[0], target: nodes[1], left: false, right: true },
+                {source: nodes[1], target: nodes[2], left: false, right: true }
+            ];
+
             //testing
             var editor = new GraphEditor("#graphEditor", {
                 nodes : nodes,
@@ -74,13 +79,15 @@
 
             //reload test
             setTimeout(function(){
-                //editor.reload({nodes: newNodes, edges: newEdges, lastNodeID : 1});
+                editor.reload({nodes: newNodes, edges: newEdges, lastNodeID : 1});
             }, 5000);
         }
     </script>
 </head>
 <body onload=demo()>
-    <h1>D3.js Graph Editor</h1></p>
+    <h1>D3.js Graph Editor</h1>
+    <p></p>
+    <button id="remove">Remove</button>
     <div id="graphEditor"></div>
 </body>
 </html>
