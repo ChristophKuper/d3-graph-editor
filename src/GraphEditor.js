@@ -318,20 +318,19 @@ GraphEditor.prototype.keydown = function(){
 	if(!self._selected_node && !self._selected_edge) return;
 
 	switch(d3.event.keyCode){
-		
+
 		case self._deleteKey:
 			if(self._selected_node)
 				self.removeNode(self._selected_node);
-
 			if(self._selected_edge)
 				self.removeEdge(self._selected_edge)
-			
+
 			break;
-		
+
 		case self._bothKey:
 			if(!self._selected_edge.left ||!self._selected_edge.right)
 				self.addEdge({source : self._selected_edge.source, target : self._selected_edge.target, left : true, right : true});
-			
+
 			break;
 
 		case self._leftKey:
@@ -340,22 +339,22 @@ GraphEditor.prototype.keydown = function(){
 
 			if(!self._selected_edge.left || self._selected_edge.right)
 				self.addEdge({source : self._selected_edge.source, target : self._selected_edge.target, left : true, right : false});
-			
+
 			break;
 
 		case self._rightKey:
-			if(self._selected_edge.left) 
+			if(self._selected_edge.left)
 				self.removeEdge(self._selected_edge, true);
-				
+
 			if(self._selected_edge.left || !self._selected_edge.right)
 				self.addEdge({source : self._selected_edge.source, target : self._selected_edge.target, left : false, right : true});
-			
+
 			break;
-		
+
 		case self._reflexsivKey:
 			if(self._selected_node)
 				self._selected_node.reflexive = !self._selected_node.reflexive;
-			
+
 			break;
 	}
 
