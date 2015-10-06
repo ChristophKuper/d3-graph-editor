@@ -14,9 +14,12 @@ GraphEditor = function(element, options){
 	this._height 		= typeof this._options.height !== 'undefined'		? this._options.height 			: "100%";
 	this._charge 		= typeof this._options.carge !== 'undefined'		? this._options.carge 			: -500;
 	this._edgeDistance 	= typeof this._options.edgeDistance !== 'undefined' ? this._options.edgeDistance 	: 150;
-
-	//config
 	this._radius 		= typeof this._options.radius !== 'undefined' 		? this._options.radius 			: 12;
+	this._deleteKey 	= typeof this._options.deleteKey !== 'undefined' 	? this._options.deleteKey 		: 46;
+	this._leftKey 		= typeof this._options.leftKey !== 'undefined' 		? this._options.leftKey 		: 37;
+	this._rightKey 		= typeof this._options.rightKey !== 'undefined' 	? this._options.rightKey 		: 39;
+	this._bothKey 		= typeof this._options.bothKey !== 'undefined' 		? this._options.bothKey 		: 66;
+	this._reflexsivKey 	= typeof this._options.reflexsivKey !== 'undefined'	? this._options.reflexsivKey 	: 82;
 	this._mouseMode 	= typeof this._options.mouseMode !== 'undefined' 	? this._options.mouseMode 		: true;
 	this._textMode 		= typeof this._options.textMode !== 'undefined' 	? this._options.textMode 		: true;
 	this._onAddNode 	= typeof this._options.onAddNode !== 'undefined' 	? this._options.onAddNode 		: function(){};
@@ -314,13 +317,12 @@ GraphEditor.prototype.keydown = function(){
 	//if no edge or node was selected return
 	if(!this._selected_node && !this._selected_edge) return;
 
-	switch(d3.event.keyCode){
-		//delete or backspace - delete node
-		case 8:
-		case 46:
-			try{
+
+	try{
+		switch(d3.event.keyCode){
+			case this._deleteKey:
 				if(this._selected_node){
-					self.removeNode(this._selected_node);
+					this.removeNode(this._selected_node);
 				}
 				if(this._selected_edge){
 					this._edges.splice(this._edges.indexOf(this._selected_edge), 1);
@@ -329,42 +331,39 @@ GraphEditor.prototype.keydown = function(){
 
 				this._selected_edge = null;
 				this._selected_node = null;
-			}finally{
-				this.restart();
-			}
+				break;
 
-			break;
-
-		//B (both)
-		case 66:
-			if(!this._selected_edge.left ||!this._selected_edge.right)
-				this.addEdge({source : this._selected_edge.source, target : this._selected_edge.target, left : true, right : true});
-			break;
-
-		//L (left)
-		case 76:
-			if(this._selected_edge.right)
-				this._onRemoveEdge(this._selected_edge);
-			if(!this._selected_edge.left || this._selected_edge.right)
-				this.addEdge({source : this._selected_edge.source, target : this._selected_edge.target, left : true, right : false});
-			break;
-
-		//R (right)
-		case 82:
-			if(this._selected_node){
-				this._selected_node.reflexive = !this._selected_node.reflexive;
-			}
-			if(this._selected_edge){
-				if(this._selected_edge.left)
+			case this._leftKey:
+				if(this._selected_edge.right)
 					this._onRemoveEdge(this._selected_edge);
-				if(this._selected_edge.left || !this._selected_edge.right)
-					this.addEdge({source : this._selected_edge.source, target : this._selected_edge.target, left : false, right : true});
-			}
-			break;
-	}
+				if(!this._selected_edge.left || this._selected_edge.right)
+					this.addEdge({source : this._selected_edge.source, target : this._selected_edge.target, left : true, right : false});
+				break;
 
-	//restart to show changes
-	this.restart();
+			case this._rightKey:
+				if(this._selected_edge){
+					if(this._selected_edge.left)
+						this._onRemoveEdge(this._selected_edge);
+					if(this._selected_edge.left || !this._selected_edge.right)
+						this.addEdge({source : this._selected_edge.source, target : this._selected_edge.target, left : false, right : true});
+				}
+				break;
+
+			case this._bothKey:
+				if(!this._selected_edge.left ||!this._selected_edge.right)
+					this.addEdge({source : this._selected_edge.source, target : this._selected_edge.target, left : true, right : true});
+				break;
+
+			case this._reflexsivKey:
+				if(this._selected_node){
+					this._selected_node.reflexive = !this._selected_node.reflexive;
+				}
+				break;
+		}
+
+	}finally{
+		this.restart();
+	}
 };
 
 /**
